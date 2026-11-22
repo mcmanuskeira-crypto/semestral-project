@@ -1,0 +1,16 @@
+\begin{tabular}{lllllllrr}
+\toprule
+Analysis & Method & Estimate & 95\% CI & Effect size & Test & p & n & Lost \\
+\midrule
+A1 & One-sample t-test (bootstrap CI) & 64.7 CZK & [63.0, 66.5] & $d=-0.05$ & $t(198)=-0.67$ & $p=.503$ & 199 & 0 \\
+A2 & Welch t-test & 3.3 CZK & [-1.1, 7.6] & $d=0.26$ & $t(34.34)=1.51$ & $p=.070$ & 199 & 0 \\
+A3 & Paired t-test & 12.2 CZK & [10.9, 13.6] & $d\_z=1.29$ & $t(196)=18.10$ & $p<.001$ & 197 & 2 \\
+A4 & Welch ANOVA + Games-Howell & Means 80.4 / 86.0 / 97.0 CZK & see A4 table & -- & $F(2.00, 22.19)=4.62$ & $p=.021$ & 198 & 1 \\
+A5 & Chi-square test (one-tailed p via z-test) & 27.7 pp & [13.7, 41.7] & $V=0.28$ & $\chi^2(1, N=197)=15.43$ & $p<.001$ & 197 & 2 \\
+A6 & Pearson r & $r=-.22$ & [-0.35, -0.08] & $r^2=.05$ & $t(193)=-3.15$ & $p=.002$ & 195 & 4 \\
+A7 & OLS (HC3 SE) & -16.3 CZK per rating point & [-26.4, -6.2] & $R^2=.05$ & $t(193)=-3.18$ & $p=.002$ & 195 & 4 \\
+A8 & OLS, two predictors (HC3 SE) & -2.7 CZK per point (was -16.3; 16.6\% remains) & [-12.4, 7.0] & $R^2=.68$ & $t(192)=-0.55$ & $p=.584$ & 195 & 4 \\
+A9 & OLS with interaction (HC3 SE) & Slope difference (roasteries minus others) -11.3 CZK per point & [-45.9, 23.3] & $R^2=.06$ & $t(191)=-0.65$ & $p=.519$ & 195 & 4 \\
+A10 & Logit + average marginal effect & -6.19 pp per 0.1 rating point & [-9.17, -3.21] & OR $=0.74$ & $z=-3.58$ & $p=1.000$ & 194 & 5 \\
+\bottomrule
+\end{tabular}

@@ -1,0 +1,11 @@
+"variable","group","normal","clt","parametric"
+"Espresso price (CZK)","All cafes",FALSE,TRUE,TRUE
+"Espresso price (CZK)","Roastery",TRUE,FALSE,TRUE
+"Espresso price (CZK)","Other cafes",FALSE,TRUE,TRUE
+"Cappuccino price (CZK)","All cafes",FALSE,TRUE,TRUE
+"Cappuccino price (CZK)","Independent",TRUE,TRUE,TRUE
+"Cappuccino price (CZK)","Local chain",FALSE,TRUE,TRUE
+"Cappuccino price (CZK)","International chain",TRUE,FALSE,TRUE
+"Flat white minus cappuccino (CZK)","Paired differences",FALSE,TRUE,TRUE
+"Flat white price (CZK)","All cafes",FALSE,TRUE,TRUE
+"Adjusted Rating (points)","All cafes",FALSE,TRUE,TRUE
