@@ -1,284 +1,221 @@
-\documentclass[aspectratio=169,10pt]{beamer}
-
-% ---------- Soft café-inspired palette ----------
-\usepackage[utf8]{inputenc}
+\documentclass[aspectratio=169,11pt]{beamer}
 \usepackage[T1]{fontenc}
-\usepackage{lmodern}
-\usepackage{booktabs}
-\usepackage{ragged2e}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
 \usepackage{tikz}
-\usepackage{xcolor}
+\usetikzlibrary{calc}
 
-\definecolor{Blush}{HTML}{F4E3E3}
-\definecolor{Rose}{HTML}{D8AEB2}
-\definecolor{DeepRose}{HTML}{A96F78}
-\definecolor{Latte}{HTML}{E9D8C8}
-\definecolor{Mocha}{HTML}{8A6B5A}
-\definecolor{Ink}{HTML}{453A36}
-\definecolor{Cream}{HTML}{FCF9F6}
-\definecolor{Muted}{HTML}{85766F}
+% ---------- cafe palette ----------
+\definecolor{cream}{HTML}{F7EFE2}
+\definecolor{latte}{HTML}{E8D5BD}
+\definecolor{caramel}{HTML}{C48A5A}
+\definecolor{mocha}{HTML}{6F4E37}
+\definecolor{espresso}{HTML}{3B2A20}
+\definecolor{sage}{HTML}{B7C9A8}
+\definecolor{blush}{HTML}{EBC8C4}
 
-\usetheme{Boadilla}
-\usecolortheme{default}
-\setbeamercolor{normal text}{fg=Ink,bg=Cream}
-\setbeamercolor{structure}{fg=DeepRose}
-\setbeamercolor{frametitle}{fg=Ink,bg=Blush}
-\setbeamercolor{title}{fg=Ink}
-\setbeamercolor{block title}{fg=Ink,bg=Latte}
-\setbeamercolor{block body}{fg=Ink,bg=Blush!45}
-\setbeamercolor{alerted text}{fg=DeepRose}
+\hyphenpenalty=10000\exhyphenpenalty=10000
+\newcommand{\storychapter}{}
+\newcommand{\presenter}{}
+\usetheme{default}
+\usefonttheme{professionalfonts}
+\renewcommand{\familydefault}{\sfdefault}
+\setbeamercolor{normal text}{fg=espresso,bg=cream}
+\setbeamercolor{background canvas}{bg=cream}
 \setbeamertemplate{navigation symbols}{}
-\setbeamertemplate{itemize item}{\color{DeepRose}\small$\blacktriangleright$}
-\setbeamertemplate{itemize subitem}{\color{Mocha}\scriptsize$\bullet$}
-\setbeamertemplate{footline}{
-  \leavevmode
-  \hbox{
-    \begin{beamercolorbox}[wd=.82\paperwidth,ht=2.7ex,dp=1.1ex,leftskip=1em]{author in head/foot}
-      \color{Muted}\scriptsize Prague Café Prices \hspace{1em}|\hspace{1em} Business Analytics
-    \end{beamercolorbox}
-    \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.7ex,dp=1.1ex,rightskip=1em plus1fil]{date in head/foot}
-      \color{Muted}\scriptsize\insertframenumber
-    \end{beamercolorbox}
-  }
-}
-\setbeamertemplate{frametitle}{
-  \vskip0.35em
-  \begin{beamercolorbox}[wd=\paperwidth,sep=.65em,leftskip=.8em]{frametitle}
-    \insertframetitle
-  \end{beamercolorbox}
-}
-\setlength{\leftmargini}{1.2em}
-\setlength{\parskip}{3pt}
+\setbeamertemplate{itemize item}{\color{caramel}$\bullet$}
+\setbeamertemplate{itemize subitem}{\color{caramel}$\circ$}
 
-\newcommand{\result}[1]{%
-  \begin{beamercolorbox}[rounded=true,sep=1em,wd=\linewidth]{block body}
-    {\Large\bfseries\color{DeepRose}#1}
-  \end{beamercolorbox}
-}
-\newcommand{\smallnote}[1]{{\scriptsize\color{Muted}#1}}
+% ---------- little coffee cup ----------
+\newcommand{\coffeecup}[1][1]{%
+\begin{tikzpicture}[scale=#1,baseline=0pt]
+  \fill[latte] (0,0) ellipse (1.7 and 0.3);
+  \fill[blush] (0,0.05) ellipse (1.25 and 0.2);
+  \draw[mocha,line width=3.2pt] (0.95,1.05) .. controls (2.05,1.2) and (1.8,0.2) .. (0.85,0.45);
+  \fill[mocha] (-1,1.35) -- (-0.8,0.3) arc(180:360:0.8 and 0.27) -- (1,1.35) -- cycle;
+  \fill[espresso] (0,1.35) ellipse (1 and 0.22);
+  \fill[caramel] (0,1.3) ellipse (0.85 and 0.16);
+  \draw[cream,line width=1.6pt,rounded corners=2pt] (-0.3,0.95) -- (0,0.55) -- (0.3,0.95);
+  \draw[caramel,line width=2.2pt,line cap=round] (-0.35,1.85) .. controls (-0.75,2.15) and (0.05,2.35) .. (-0.35,2.75);
+  \draw[caramel,line width=2.2pt,line cap=round] (0.35,1.85) .. controls (-0.05,2.15) and (0.75,2.35) .. (0.35,2.75);
+\end{tikzpicture}}
 
-\title[Prague Café Prices]{Coffee Prices \& Café Characteristics}
-\subtitle{Findings from 199 cafés in Prague}
+% coffee bean decoration
+\newcommand{\bean}[2]{\begin{tikzpicture}[baseline=0pt,rotate=#1,scale=#2]
+  \fill[mocha] (0,0) ellipse (0.5 and 0.32);
+  \draw[cream,line width=1pt] (-0.45,-0.03) .. controls (-0.1,0.2) and (0.1,-0.2) .. (0.45,0.03);
+\end{tikzpicture}}
+
+% ---------- page decoration: latte strip at the bottom, cup in the corner ----------
+\setbeamertemplate{background}{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[latte] (current page.south west) rectangle ([yshift=0.55cm]current page.south east);
+    \fill[caramel] ([yshift=0.55cm]current page.south west) rectangle ([yshift=0.62cm]current page.south east);
+  \end{tikzpicture}}
+\setbeamertemplate{footline}{\leavevmode\hspace{1.2em}\textcolor{mocha}{\footnotesize\presenter}\hfill\textcolor{mocha}{\footnotesize\bfseries\insertframenumber}\hspace{1.2em}\vspace{0.12cm}}
+
+% ---------- frame title ----------
+\setbeamertemplate{frametitle}{%
+  \vspace{0.5em}\hspace{0.2em}%
+  \begin{minipage}[t]{0.86\paperwidth}\raggedright
+    {\scriptsize\bfseries\color{caramel}\MakeUppercase{\storychapter}}\\[-2pt]
+    {\Large\bfseries\color{mocha}\insertframetitle}\\[-1pt]
+    \textcolor{caramel}{\rule{3.2cm}{2.2pt}}
+  \end{minipage}%
+  \hfill\raisebox{-0.2cm}{\coffeecup[0.2]}\hspace{0.2em}}
+
+% ---------- building blocks ----------
+% figure inside a rounded white card
+\newcommand{\figcard}[1]{%
+  \tikz\node[draw=latte,line width=2pt,fill=white,rounded corners=9pt,inner sep=5pt]{%
+    \IfFileExists{../report/figures/#1}%
+      {\includegraphics[width=\dimexpr\linewidth-16pt\relax]{../report/figures/#1}}%
+      {\parbox{\dimexpr\linewidth-16pt\relax}{\centering Missing figure:\\ \detokenize{#1}}}};}
+% big number card
+\newcommand{\statcard}[2]{%
+  \tikz\node[fill=mocha,rounded corners=10pt,inner sep=8pt,text width=\dimexpr\linewidth-16pt\relax,
+             align=center,text=cream]{{\Large\bfseries #1}\\[3pt]{\footnotesize #2}};}
+% takeaway card
+\newcommand{\takecard}[1]{%
+  \tikz\node[fill=sage,rounded corners=10pt,inner sep=8pt,text width=\dimexpr\linewidth-16pt\relax,
+             align=left,text=espresso]{\small\textbf{#1}};}
+% info card for the intro
+\newcommand{\infocard}[2]{%
+  \tikz\node[fill=latte,draw=caramel,line width=1.2pt,rounded corners=10pt,inner sep=9pt,
+             text width=\dimexpr\linewidth-20pt\relax,align=left,text=espresso]{%
+    {\bfseries\color{mocha}#1}\\[3pt]\small #2};}
+
+% one slide per question: title, figure file, big number, sub line, details, takeaway
+\newcommand{\qslide}[6]{%
+  \begin{frame}{#1}
+    \begin{columns}[T,onlytextwidth]
+      \column{0.53\textwidth}\figcard{#2}
+      \column{0.44\textwidth}
+        \statcard{#3}{#4}\par\vspace{5pt}
+        {\small\raggedright #5\par}\vspace{5pt}
+        \takecard{#6}
+    \end{columns}
+  \end{frame}}
+
+\title{Coffee Prices and Caf\'e Characteristics in Prague}
 \author{Eden Rae Warner \and Keira}
-\institute{Introduction to Business Analytics}
+\institute{Data Analytics, Batch N}
 \date{November 2026}
 
 \begin{document}
 
-% ---------- Cover ----------
-{
-\setbeamertemplate{footline}{}
+% ---------- title ----------
 \begin{frame}[plain]
   \begin{tikzpicture}[remember picture,overlay]
-    \fill[Blush] (current page.north west) rectangle ([yshift=-2.0cm]current page.north east);
-    \fill[Latte!75] (current page.south west) rectangle ([yshift=1.0cm]current page.south east);
-    \fill[Rose!45] ([xshift=-1.2cm,yshift=-1.0cm]current page.north east) circle (1.8cm);
-    \fill[Mocha!15] ([xshift=1.2cm,yshift=1.1cm]current page.south west) circle (1.5cm);
+    \fill[latte] (current page.south west) rectangle ([yshift=1.1cm]current page.south east);
+    \fill[caramel] ([yshift=1.1cm]current page.south west) rectangle ([yshift=1.2cm]current page.south east);
+    \node at ([xshift=-3.4cm,yshift=0.2cm]current page.center) [anchor=center,align=left,text width=8.4cm] {%
+      {\fontsize{22}{26}\selectfont\bfseries\color{mocha} Coffee Prices\\ \& Caf\'e Characteristics\\ in Prague}\\[10pt]
+      \textcolor{caramel}{\rule{3.5cm}{2.5pt}}\\[8pt]
+      {\large\color{espresso} Eden Rae Warner \& Keira}\\[2pt]
+      {\small\color{mocha} Data Analytics, Batch N \quad$\cdot$\quad November 2026}};
+    \node at ([xshift=4.6cm,yshift=0.1cm]current page.center) {\coffeecup[1.45]};
+    \node at ([xshift=2.6cm,yshift=-2.4cm]current page.center) {\bean{25}{0.55}};
+    \node at ([xshift=6.7cm,yshift=-2.2cm]current page.center) {\bean{-20}{0.45}};
+    \node at ([xshift=5.4cm,yshift=2.7cm]current page.center) {\bean{60}{0.4}};
+    \node at ([xshift=6.9cm,yshift=1.9cm]current page.center) {\bean{-35}{0.5}};
   \end{tikzpicture}
-  \vspace{1.15cm}
-  {\color{DeepRose}\small DATA ANALYTICS \hspace{.5em} $\cdot$ \hspace{.5em} RESULTS}
-  \vspace{.3cm}
-
-  {\LARGE\bfseries Coffee Prices \&\\[.15em] Café Characteristics}
-  \vspace{.35cm}
-
-  {\large Findings from a sample of 199 Prague cafés}
-  \vfill
-  \textbf{Eden Rae Warner \quad | \quad Keira}\\
-  \smallnote{Batch N \hspace{1em} • \hspace{1em} November 2026}
-  \vspace{.35cm}
-\end{frame}
-}
-
-% ---------- A1 ----------
-\begin{frame}{A1 \quad Is espresso more or less expensive than 3 USD?}
-  \result{64.7 CZK average espresso price}
-  \vspace{.45cm}
-  \begin{itemize}
-    \item Benchmark: \textbf{65.3 CZK} (equivalent of 3 USD).
-    \item Difference: only \textbf{-0.6 CZK}.
-    \item 95\% CI: [63.0, 66.5]; \quad $p=.503$; \quad $n=199$.
-  \end{itemize}
-  \vfill
-  \begin{beamercolorbox}[rounded=true,sep=.7em]{block body}
-    \textbf{Takeaway:} No evidence that the sample's mean espresso price differs from the 3 USD benchmark.
-  \end{beamercolorbox}
 \end{frame}
 
-% ---------- A2 ----------
-\begin{frame}{A2 \quad Do roasteries charge more for espresso?}
-  \result{+3.3 CZK at roasteries, on average}
-  \vspace{.45cm}
-  \begin{itemize}
-    \item Difference (roasteries minus other cafés): \textbf{3.3 CZK}.
-    \item 95\% CI: [-1.1, 7.6]; \quad one-tailed $p=.070$.
-    \item 23 roasteries and 176 other cafés.
-  \end{itemize}
-  \vfill
-  \begin{beamercolorbox}[rounded=true,sep=.7em]{block body}
-    \textbf{Takeaway:} The estimated premium is small and not statistically significant. The result does not rule out a modest premium.
-  \end{beamercolorbox}
-\end{frame}
-
-% ---------- A3 ----------
-\begin{frame}{A3 \quad How much more does a flat white cost?}
-  \result{12.2 CZK more than a cappuccino}
-  \vspace{.45cm}
-  \begin{itemize}
-    \item Average difference within the same café.
-    \item 95\% CI: [10.9, 13.6]; \quad one-tailed $p<.001$.
-    \item 197 cafés had both prices.
-  \end{itemize}
-  \vfill
-  \begin{beamercolorbox}[rounded=true,sep=.7em]{block body}
-    \textbf{Takeaway:} Flat whites were consistently more expensive—about 15\% more than the average cappuccino price.
-  \end{beamercolorbox}
-\end{frame}
-
-% ---------- A4 ----------
-\begin{frame}{A4 \quad Does cappuccino price differ by café type?}
-  \result{Local chains charged 5.6 CZK more than independents}
-  \vspace{.35cm}
-  \begin{center}
-  \begin{tabular}{lrr}
-    \toprule
-    Café type & Mean price & Cafés ($n$)\\
-    \midrule
-    Independent & 80.4 CZK & 138\\
-    Local chain & 86.0 CZK & 50\\
-    International chain & 97.0 CZK & 10\\
-    \bottomrule
-  \end{tabular}
-  \end{center}
-  \vspace{.2cm}
-  \begin{itemize}
-    \item Overall difference: Welch ANOVA, $p=.021$.
-    \item Only independent vs. local chain was significant (adjusted $p=.030$).
-  \end{itemize}
-  \begin{beamercolorbox}[rounded=true,sep=.6em]{block body}
-    \textbf{Takeaway:} Local chains were modestly more expensive than independent cafés. International-chain estimates are uncertain (only 10 cafés).
-  \end{beamercolorbox}
-\end{frame}
-
-% ---------- A5 ----------
-\begin{frame}{A5 \quad Are above-median flat whites more common in Prague 1?}
-  \result{50.7\% in Prague 1 \quad vs. \quad 23.1\% elsewhere}
-  \vspace{.45cm}
-  \begin{itemize}
-    \item Difference: \textbf{27.7 percentage points}.
-    \item 95\% CI: [13.7, 41.7]; \quad one-tailed $p<.001$.
-    \item “Above median” means a flat white price strictly above 95 CZK.
-  \end{itemize}
-  \vfill
-  \begin{beamercolorbox}[rounded=true,sep=.7em]{block body}
-    \textbf{Takeaway:} Cafés in Prague 1 were substantially more likely to charge above the sample median for a flat white.
-  \end{beamercolorbox}
-\end{frame}
-
-% ---------- A6 ----------
-\begin{frame}{A6 \quad Is cappuccino price related to Adjusted Rating?}
-  \result{A weak negative correlation: $r=-.22$}
-  \vspace{.45cm}
-  \begin{itemize}
-    \item 95\% CI: [-.35, -.08].
-    \item $p=.002$; \quad $n=195$.
-    \item Only about 5\% of price variation was shared with Adjusted Rating.
-  \end{itemize}
-  \vfill
-  \begin{beamercolorbox}[rounded=true,sep=.7em]{block body}
-    \textbf{Takeaway:} Higher-rated cafés tended to charge slightly less for cappuccino, but the relationship was weak.
-  \end{beamercolorbox}
-\end{frame}
-
-% ---------- A7 ----------
-\begin{frame}{A7 \quad How does cappuccino price change with Adjusted Rating?}
-  \result{-16.3 CZK per 1-point increase in rating}
-  \vspace{.45cm}
-  \begin{itemize}
-    \item 95\% CI: [-26.4, -6.2].
-    \item $p=.002$; \quad $R^2=.05$; \quad $n=195$.
-    \item A more realistic 0.1-point increase corresponds to about \textbf{1.6 CZK lower}.
-  \end{itemize}
-  \vfill
-  \begin{beamercolorbox}[rounded=true,sep=.7em]{block body}
-    \textbf{Takeaway:} The negative association is statistically clear but small in practical terms; the model explains only 5\% of price variation.
-  \end{beamercolorbox}
-\end{frame}
-
-% ---------- A8 ----------
-\begin{frame}{A8 \quad Does the rating link remain after accounting for espresso price?}
-  \result{Only 16.6\% of the original slope remained}
-  \vspace{.4cm}
-  \begin{itemize}
-    \item Rating slope changed from \textbf{-16.3} to \textbf{-2.7 CZK} per point.
-    \item 95\% CI: [-12.4, 7.0]; \quad $p=.584$.
-    \item Model $R^2$ increased from .05 to .68 after adding espresso price.
-  \end{itemize}
-  \vfill
-  \begin{beamercolorbox}[rounded=true,sep=.7em]{block body}
-    \textbf{Takeaway:} The rating–cappuccino relationship was no longer statistically clear once espresso price was included.
-  \end{beamercolorbox}
-\end{frame}
-
-% ---------- A9 ----------
-\begin{frame}{A9 \quad Does the rating–price link differ for roasteries?}
-  \result{No clear difference between the two groups}
-  \vspace{.4cm}
-  \begin{itemize}
-    \item Estimated slope: other cafés \textbf{-16.0} CZK per point.
-    \item Estimated slope: roasteries \textbf{-27.3} CZK per point.
-    \item Difference in slopes: -11.3 CZK; 95\% CI [-45.9, 23.3]; \quad $p=.519$.
-    \item Only 23 roasteries were included.
-  \end{itemize}
-  \vfill
-  \begin{beamercolorbox}[rounded=true,sep=.7em]{block body}
-    \textbf{Takeaway:} Although the estimated slope was steeper for roasteries, the difference was too uncertain to distinguish from zero.
-  \end{beamercolorbox}
-\end{frame}
-
-% ---------- A10 ----------
-\begin{frame}{A10 \quad Are better-rated cafés more likely to price flat whites above the median?}
-  \result{Estimated probability fell by 6.2 percentage points per 0.1 rating point}
-  \vspace{.35cm}
-  \begin{itemize}
-    \item 95\% CI: [-9.17, -3.21]; \quad $n=194$.
-    \item Odds ratio: 0.74 (95\% CI [0.62, 0.87]).
-    \item The estimated direction was opposite to the prediction; one-tailed $p> .999$.
-  \end{itemize}
-  \vfill
-  \begin{beamercolorbox}[rounded=true,sep=.7em]{block body}
-    \textbf{Takeaway:} No support for the predicted positive relationship. The negative direction is exploratory, not a confirmed finding.
-  \end{beamercolorbox}
-\end{frame}
-
-% ---------- Final ----------
-\begin{frame}{What do the results tell us overall?}
+% ---------- introduction ----------
+\renewcommand{\presenter}{Keira}
+\renewcommand{\storychapter}{Introduction}
+\begin{frame}{What we asked}
   \begin{columns}[T,onlytextwidth]
-    \column{.49\textwidth}
-      \begin{beamercolorbox}[rounded=true,sep=.8em,wd=\linewidth]{block body}
-        \textbf{\color{DeepRose}Clearer patterns}
-        \begin{itemize}
-          \item Flat whites cost about 12 CZK more than cappuccinos.
-          \item Prague 1 cafés were more likely to charge above-median flat white prices.
-          \item Local chains charged more than independent cafés for cappuccino.
-        \end{itemize}
-      \end{beamercolorbox}
-    \column{.49\textwidth}
-      \begin{beamercolorbox}[rounded=true,sep=.8em,wd=\linewidth]{block body}
-        \textbf{\color{Mocha}More uncertain patterns}
-        \begin{itemize}
-          \item No clear espresso premium for roasteries.
-          \item Rating–price association weakened after controlling for espresso price.
-          \item No clear difference in rating slopes between roasteries and other cafés.
-        \end{itemize}
-      \end{beamercolorbox}
+    \column{0.31\textwidth}\infocard{The data}{199 Prague caf\'es, visited in person by students in autumn 2026. A convenience sample.}
+    \column{0.31\textwidth}\infocard{The topic}{What do caf\'es charge, and what goes with price? Espresso, cappuccino and flat white.}
+    \column{0.31\textwidth}\infocard{The questions}{Ten analyses, from a single average to logistic regression.}
   \end{columns}
-  \vfill
-  {\small\bfseries Important limitations}
-  \small The data are observational and come from a convenience sample. Findings describe the cafés sampled; they cannot be generalised to all Prague cafés or interpreted as causal effects.
-  \vspace{.25cm}
+  \vspace{10pt}
+  \begin{center}\takecard{Observational data: we describe patterns in the sample, not causes.}\end{center}
+\end{frame}
 
-  \smallnote{Source: An Analysis of Coffee Prices and Café Characteristics in Prague (November 2026).}
+\begin{frame}{The story in three steps}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.31\textwidth}\infocard{1. The price level}{What does a coffee cost? Espresso vs.\ 3 USD, roasteries, flat white vs.\ cappuccino. \emph{(A1--A3, Keira)}}
+    \column{0.31\textwidth}\infocard{2. Who charges more?}{Caf\'e type and location: independent caf\'es, chains and Prague 1. \emph{(A4--A5, Keira)}}
+    \column{0.31\textwidth}\infocard{3. Do ratings explain price?}{Correlation, regression, roasteries and the chance of an expensive flat white. \emph{(A6--A10, Eden)}}
+  \end{columns}
+\end{frame}
+
+% ---------- step 1 ----------
+\renewcommand{\storychapter}{1 \,$\cdot$\, The price level}
+\qslide{A1: Is the average espresso different from 3 USD?}{A1_figure.pdf}
+  {64.7 CZK}{average espresso \,$\cdot$\, 95\% CI [63.0, 66.5] \,$\cdot$\, $n=199$}
+  {Benchmark: 65.3 CZK (21.76 CZK per USD)\\ Effect size: $d=-0.05$ (negligible)\\ One-sample $t$-test, $p=.503$}
+  {No evidence that the average differs from 3 USD.}
+
+\qslide{A2: Do roasteries charge more for an espresso?}{A2_figure.pdf}
+  {+3.3 CZK}{roasteries minus others \,$\cdot$\, 95\% CI [$-1.1$, 7.6]}
+  {Effect size: $d=0.26$ (small)\\ Welch $t$-test, one-tailed $p=.070$\\ 23 roasteries, 176 other caf\'es}
+  {No clear evidence of a premium. With only 23 roasteries the test is weak.}
+
+\qslide{A3: How much more is a flat white than a cappuccino?}{A3_figure.pdf}
+  {+12.2 CZK}{in the same caf\'e \,$\cdot$\, 95\% CI [10.9, 13.6] \,$\cdot$\, $n=197$}
+  {Effect size: $d_z=1.29$ (very large)\\ Paired $t$-test, one-tailed $p<.001$}
+  {About 15\% more than a cappuccino. Our clearest result.}
+
+% ---------- step 2 ----------
+\renewcommand{\storychapter}{2 \,$\cdot$\, Who charges more?}
+\qslide{A4: Does the cappuccino price differ by caf\'e type?}{A4_figure.pdf}
+  {80.4 / 86.0 / 97.0 CZK}{independent / local chain / international chain}
+  {Welch ANOVA: $F(2,\,22.19)=4.62$, $p=.021$\\ Effect: independent vs.\ local chain $-5.6$ CZK, 95\% CI [$-10.8$, $-0.4$], $p=.030$}
+  {Local chains charge about 7\% more. Only 10 international chains: too few to say more.}
+
+\qslide{A5: Prague 1 and an above-median flat white}{A5_figure.pdf}
+  {+27.7 percentage points}{50.7\% in Prague 1 vs.\ 23.1\% elsewhere \,$\cdot$\, 95\% CI [13.7, 41.7]}
+  {Effect size: Cram\'er's $V=.28$ (moderate)\\ $\chi^2$ test, one-tailed $p<.001$\\ Median flat white: 95 CZK}
+  {Prague 1 caf\'es are much more likely to price a flat white high.}
+
+% ---------- step 3 ----------
+\renewcommand{\presenter}{Eden}
+\renewcommand{\storychapter}{3 \,$\cdot$\, Do ratings explain price?}
+\qslide{A6: Is cappuccino price correlated with rating?}{A6_figure.pdf}
+  {$r=-.22$}{Pearson correlation \,$\cdot$\, 95\% CI [$-.35$, $-.08$] \,$\cdot$\, $n=195$}
+  {Effect size: $r^2=.05$ (5\% shared variance)\\ $p=.002$}
+  {Weak and negative: higher-rated caf\'es charge slightly less, not more.}
+
+\qslide{A7: How much does price change per rating point?}{A7_figure.pdf}
+  {$-16.3$ CZK per point}{95\% CI [$-26.4$, $-6.2$] \,$\cdot$\, about $-1.6$ CZK per 0.1}
+  {Effect size: $R^2=.05$\\ Linear regression, $p=.002$}
+  {A clear but small association: ratings explain only 5\% of the variation in price.}
+
+\qslide{A8: Does it hold once espresso price is accounted for?}{A8_figure.pdf}
+  {$-2.7$ CZK per point}{95\% CI [$-12.4$, 7.0] \,$\cdot$\, only 16.6\% of the slope remains}
+  {Effect size: $R^2$ rises from .05 to .68\\ Multiple regression, $p=.584$\\ Espresso price coefficient: 0.97}
+  {The rating link mostly reflects espresso prices: higher-rated caf\'es tend to have cheaper espresso.}
+
+\qslide{A9: Does the rating--price slope differ for roasteries?}{A9_figure.pdf}
+  {$-11.3$ CZK}{slope difference, roasteries minus others \,$\cdot$\, 95\% CI [$-45.9$, 23.3]}
+  {Slopes: other caf\'es $-16.0$, roasteries $-27.3$ CZK per point\\ Effect size: $R^2=.06$\\ Regression with interaction, $p=.519$}
+  {No evidence the relationship differs between roasteries and other caf\'es.}
+
+\qslide{A10: Are better-rated caf\'es more likely to charge above the median?}{A10_figure.pdf}
+  {$-6.2$ pp per 0.1 rating}{average marginal effect \,$\cdot$\, 95\% CI [$-9.2$, $-3.2$]}
+  {Effect size: odds ratio $=0.74$\\ Logistic regression, one-tailed $p>.999$}
+  {No: the effect goes the opposite way. This direction was not predicted, so it is exploratory.}
+
+% ---------- conclusion ----------
+\renewcommand{\presenter}{Eden \& Keira}
+\renewcommand{\storychapter}{Conclusion}
+\begin{frame}{What we found}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+      \infocard{Prices}{An average espresso costs about what 3 USD buys. A flat white costs about 12 CZK more than a cappuccino.}
+      \par\vspace{6pt}
+      \infocard{Where and who}{Prague 1 caf\'es are far more likely to charge above the median. Local chains charge a little more than independent caf\'es.}
+    \column{0.48\textwidth}
+      \infocard{Ratings}{Higher ratings do not mean higher prices. The weak negative link mostly follows espresso prices.}
+      \par\vspace{6pt}
+      \infocard{Roasteries}{No clear evidence that roasteries charge more.}
+  \end{columns}
+  \vspace{8pt}
+  \begin{center}\takecard{Limits: convenience sample, observational data, caf\'es in the same district are not independent, small roastery and chain groups.}\end{center}
 \end{frame}
 
 \end{document}
