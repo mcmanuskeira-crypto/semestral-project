@@ -1,6 +1,6 @@
 {
     "id": "43C920F8",
-    "path": "~/Downloads/analysis/01_cleaning.R",
+    "path": "~/Downloads/semestralproject/analysis/01_cleaning.R",
     "project_path": "01_cleaning.R",
     "type": "r_source",
     "hash": "2429152585",
@@ -12,7 +12,7 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "263,0",
+        "cursorPosition": "9,23",
         "scrollLine": "0"
     },
     "folds": "",
