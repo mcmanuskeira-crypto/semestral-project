@@ -63,18 +63,44 @@ n_before <- nrow(raw)
 df <- raw[!empty, ]
 cat("Rows after dropping empty rows:", nrow(df), "\n")
 
-# Duplicates: same cafe name AND address entered more than once?
-key <- paste(tolower(df$cafe), tolower(df$address))
-dup_key <- key %in% key[duplicated(key)]
-cat("\n=== Rows sharing the same cafe name + address (inspect by eye) ===\n")
-print(df[dup_key, c("name", "cafe", "address", "p_espresso", "p_cappuccino",
-                    "rating", "n_ratings")])
-# DECISION: these are the same physical cafe recorded by two people (same
-# address, coordinates, rating, number of ratings), not two different cafes.
-# Keep the first entry, drop the later one(s). Prices differ, so they are not
-# exact duplicates - the first entry's prices are kept.
-df <- df[!duplicated(key), ]
-cat("Rows after removing repeated cafe entries:", nrow(df), "\n")
+# The sheet also holds the professor's example row (collector "Vojtech Zika").
+# It was not collected by a student, so it is not part of the data.
+is_example <- grepl("^Vojt", df$name)
+cat("\nExample row removed:", df$cafe[is_example], "\n")
+df <- df[!is_example, ]
+cat("Student rows:", nrow(df), "\n")
+
+# Duplicates: the same cafe entered by two students. The spelling differs
+# ("Cafe Savoy" / "Cafe Savoy"), so first list all entries whose coordinates
+# are within 30 metres of each other and inspect them by eye.
+xy  <- strsplit(df$coords, ",")
+lat <- as.numeric(sapply(xy, function(z) z[1]))
+lon <- as.numeric(sapply(xy, function(z) z[2]))
+pr  <- which(upper.tri(diag(nrow(df))), arr.ind = TRUE)
+metres <- sqrt(((lat[pr[, 1]] - lat[pr[, 2]]) * 111)^2 + ((lon[pr[, 1]] - lon[pr[, 2]]) * 71)^2) * 1000
+w <- which(metres <= 30)
+cat("\n=== Entries within 30 m of each other ===\n")
+print(data.frame(cafe_1 = df$cafe[pr[w, 1]], by_1 = df$name[pr[w, 1]],
+                 cafe_2 = df$cafe[pr[w, 2]], by_2 = df$name[pr[w, 2]], metres = round(metres[w])),
+      row.names = FALSE)
+
+# DECISION: 11 of these pairs are the same cafe entered twice (same place, same
+# rating and number of ratings, different spelling of the name). Other close
+# pairs are different cafes in the same building (e.g. "The Cup" and "Atomic
+# matcha") and are kept. EMA espresso bar appears at several different
+# addresses, so those are different branches and are kept too.
+# For each repeated cafe the first entry in the sheet is kept, the second is dropped.
+dup_patterns <- c("louvre", "starbucks reserve", "no.?26", "milani", "republica", "duo cafe",
+                  "vescovi", "mondie?u", "kampa cafe", "savoy", "^cafe.?cafe$")
+cafe_lc  <- tolower(trimws(df$cafe))
+drop_row <- integer(0)
+for (pt in dup_patterns) {
+  rows <- which(grepl(pt, cafe_lc))
+  stopifnot(length(rows) == 2)            # each pattern must match exactly the two entries
+  drop_row <- c(drop_row, rows[2])
+}
+df <- df[-drop_row, ]
+cat("Cafes after removing repeated entries:", nrow(df), "\n")
 
 # ---------- 2. CATEGORIES ----------
 cat("\n=== Raw categories ===\n")

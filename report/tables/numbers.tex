@@ -1,0 +1,148 @@
+\newcommand{\AOneMethod}{One-sample t-test (bootstrap CI)}
+\newcommand{\AOneEst}{64.5 CZK}
+\newcommand{\AOneCI}{[62.7, 66.3]}
+\newcommand{\AOneEff}{$d=-0.06$}
+\newcommand{\AOneTest}{$t(188)=-0.81$}
+\newcommand{\AOneP}{$p=.417$}
+\newcommand{\AOneN}{189}
+\newcommand{\AOneLost}{0}
+\newcommand{\ATwoMethod}{Welch t-test}
+\newcommand{\ATwoEst}{3.0 CZK}
+\newcommand{\ATwoCI}{[$-$1.5, 7.5]}
+\newcommand{\ATwoEff}{$d=0.24$}
+\newcommand{\ATwoTest}{$t(32.46)=1.37$}
+\newcommand{\ATwoP}{$p=.090$}
+\newcommand{\ATwoN}{189}
+\newcommand{\ATwoLost}{0}
+\newcommand{\AThreeMethod}{Paired t-test}
+\newcommand{\AThreeEst}{12.1 CZK}
+\newcommand{\AThreeCI}{[10.8, 13.5]}
+\newcommand{\AThreeEff}{$d_z=1.27$}
+\newcommand{\AThreeTest}{$t(186)=17.37$}
+\newcommand{\AThreeP}{$p<.001$}
+\newcommand{\AThreeN}{187}
+\newcommand{\AThreeLost}{2}
+\newcommand{\AFourMethod}{Welch ANOVA + Games-Howell}
+\newcommand{\AFourEst}{Means 80.7 / 85.2 / 93.4 CZK}
+\newcommand{\AFourCI}{see A4 table}
+\newcommand{\AFourEff}{--}
+\newcommand{\AFourTest}{$F(2, 17.54)=2.64$}
+\newcommand{\AFourP}{$p=.100$}
+\newcommand{\AFourN}{188}
+\newcommand{\AFourLost}{1}
+\newcommand{\AFiveMethod}{Chi-square test (one-tailed p via z-test)}
+\newcommand{\AFiveEst}{27.2 pp}
+\newcommand{\AFiveCI}{[12.6, 41.8]}
+\newcommand{\AFiveEff}{$V=0.27$}
+\newcommand{\AFiveTest}{$\chi^2(1, N=187)=13.92$}
+\newcommand{\AFiveP}{$p<.001$}
+\newcommand{\AFiveN}{187}
+\newcommand{\AFiveLost}{2}
+\newcommand{\ASixMethod}{Pearson r}
+\newcommand{\ASixEst}{$r=-.21$}
+\newcommand{\ASixCI}{[$-$0.34, $-$0.06]}
+\newcommand{\ASixEff}{$r^2=.04$}
+\newcommand{\ASixTest}{$t(184)=-2.85$}
+\newcommand{\ASixP}{$p=.005$}
+\newcommand{\ASixN}{186}
+\newcommand{\ASixLost}{3}
+\newcommand{\ASevenMethod}{OLS (HC3 SE)}
+\newcommand{\ASevenEst}{$-$14.9 CZK per rating point}
+\newcommand{\ASevenCI}{[$-$25.4, $-$4.4]}
+\newcommand{\ASevenEff}{$R^2=.04$}
+\newcommand{\ASevenTest}{$t(184)=-2.80$}
+\newcommand{\ASevenP}{$p=.006$}
+\newcommand{\ASevenN}{186}
+\newcommand{\ASevenLost}{3}
+\newcommand{\AEightMethod}{Multiple regression (OLS), HC3 SE}
+\newcommand{\AEightEst}{$-$3.1 CZK per rating point}
+\newcommand{\AEightCI}{[$-$13.3, 7.2]}
+\newcommand{\AEightEff}{$R^2=.68$}
+\newcommand{\AEightTest}{$t(183)=-0.59$}
+\newcommand{\AEightP}{$p=.554$}
+\newcommand{\AEightN}{186}
+\newcommand{\AEightLost}{3}
+\newcommand{\ANineMethod}{OLS with interaction (HC3 SE)}
+\newcommand{\ANineEst}{Slope difference (roasteries minus others) $-$1.4 CZK per point}
+\newcommand{\ANineCI}{[$-$23.2, 20.4]}
+\newcommand{\ANineEff}{$R^2=.05$}
+\newcommand{\ANineTest}{$t(182)=-0.13$}
+\newcommand{\ANineP}{$p=.899$}
+\newcommand{\ANineN}{186}
+\newcommand{\ANineLost}{3}
+\newcommand{\ATenMethod}{Logit + average marginal effect}
+\newcommand{\ATenEst}{$-$5.66 pp per 0.1 rating point}
+\newcommand{\ATenCI}{[$-$8.71, $-$2.62]}
+\newcommand{\ATenEff}{OR $=0.75$}
+\newcommand{\ATenTest}{$z=-3.26$}
+\newcommand{\ATenP}{$p=.001$}
+\newcommand{\ATenN}{185}
+\newcommand{\ATenLost}{4}
+\newcommand{\ATotal}{189}
+\newcommand{\AOneBench}{65.3}
+\newcommand{\AOneRate}{21.76}
+\newcommand{\AOneDiff}{$-$0.7}
+\newcommand{\ATwoNRoast}{22}
+\newcommand{\ATwoNOther}{167}
+\newcommand{\ATwoMeanRoast}{67.2}
+\newcommand{\ATwoMeanOther}{64.2}
+\newcommand{\ATwoLevene}{$p=.192$}
+\newcommand{\AThreeMedian}{10.0}
+\newcommand{\AThreeSame}{7}
+\newcommand{\AThreePct}{14.7}
+\newcommand{\AFourNInd}{132}
+\newcommand{\AFourMeanInd}{80.7}
+\newcommand{\AFourCIInd}{[78.3, 83.0]}
+\newcommand{\AFourNLoc}{48}
+\newcommand{\AFourMeanLoc}{85.2}
+\newcommand{\AFourCILoc}{[81.5, 88.9]}
+\newcommand{\AFourNInt}{8}
+\newcommand{\AFourMeanInt}{93.4}
+\newcommand{\AFourCIInt}{[67.5, 119.2]}
+\newcommand{\AFourLevene}{$p<.001$}
+\newcommand{\AFourPairOneDiff}{$-$4.5}
+\newcommand{\AFourPairOneCI}{[$-$9.7, 0.6]}
+\newcommand{\AFourPairOneP}{$p=.096$}
+\newcommand{\AFourPairTwoDiff}{$-$12.7}
+\newcommand{\AFourPairTwoCI}{[$-$44.9, 19.5]}
+\newcommand{\AFourPairTwoP}{$p=.512$}
+\newcommand{\AFourPairThreeDiff}{$-$8.2}
+\newcommand{\AFourPairThreeCI}{[$-$40.4, 24.1]}
+\newcommand{\AFourPairThreeP}{$p=.749$}
+\newcommand{\AFiveYesOne}{30}
+\newcommand{\AFiveNOne}{60}
+\newcommand{\AFivePctOne}{50.0}
+\newcommand{\AFiveYesTwo}{29}
+\newcommand{\AFiveNTwo}{127}
+\newcommand{\AFivePctTwo}{22.8}
+\newcommand{\AFiveMedian}{95.0}
+\newcommand{\AFiveMinExp}{18.9}
+\newcommand{\AFiveStdRes}{3.73}
+\newcommand{\ASevenPerTenth}{$-$1.5}
+\newcommand{\ASevenBP}{$p=.017$}
+\newcommand{\ASevenSW}{$p=.006$}
+\newcommand{\ASevenCook}{11}
+\newcommand{\AEightSimple}{$-$14.9}
+\newcommand{\AEightRemain}{20.6}
+\newcommand{\AEightVIF}{1.04}
+\newcommand{\AEightEsp}{0.95}
+\newcommand{\AEightEspCI}{[0.80, 1.10]}
+\newcommand{\AEightEspP}{$p<.001$}
+\newcommand{\AEightBP}{$p<.001$}
+\newcommand{\AEightSW}{$p<.001$}
+\newcommand{\AEightCook}{16}
+\newcommand{\ANineSlopeOther}{$-$15.1}
+\newcommand{\ANineSlopeOtherCI}{[$-$26.3, $-$4.0]}
+\newcommand{\ANineSlopeRoast}{$-$16.5}
+\newcommand{\ANineSlopeRoastCI}{[$-$35.2, 2.1]}
+\newcommand{\ANineRoast}{22}
+\newcommand{\ANineInt}{$-$1.4}
+\newcommand{\ANineBP}{$p=.025$}
+\newcommand{\ANineSW}{$p=.004$}
+\newcommand{\ANineCook}{5}
+\newcommand{\ATenOR}{0.75}
+\newcommand{\ATenORCI}{[0.64, 0.89]}
+\newcommand{\ATenEvents}{58}
+\newcommand{\ATenLin}{$p=.952$}
+\newcommand{\ATenCook}{7}
+\newcommand{\ATenMcf}{0.05}

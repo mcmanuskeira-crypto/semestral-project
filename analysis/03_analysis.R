@@ -151,7 +151,7 @@ par4 <- is_param(VN$cap, levels(g)); lev4 <- levene_p(x, g)
 gc <- group_ci(x, g)
 if (par4) {
   wo <- oneway.test(x ~ g, var.equal = FALSE)            # Welch F
-  stat4 <- paste0("$F(", f2(wo$parameter[1]), ", ", f2(wo$parameter[2]), ")=", f2(wo$statistic), "$")
+  stat4 <- paste0("$F(", round(wo$parameter[1]), ", ", f2(wo$parameter[2]), ")=", f2(wo$statistic), "$")
   p4 <- wo$p.value; m4 <- "Welch ANOVA + Games-Howell"
   ph <- games_howell(x, g)
   PH <- data.frame(Pair = ph$pair, `Difference (CZK)` = f1(ph$diff), `95% CI` = ci_str(ph$lo, ph$hi, f1),
@@ -286,42 +286,41 @@ add_sum("A7", paste0("OLS", if (rob7) " (HC3 SE)" else ""), paste(f1(b7), "CZK p
         paste0("$R^2=", sub("^0", "", f2(summary(m7)$r.squared)), "$"), s7, pfmt(rt7$p["adj_rating"]), n6, N - n6)
 
 # ============================================================
-# A8  Multiple regression: does the link hold after controlling for espresso price?
+# A8  Multiple regression: cappuccino price on Adjusted Rating and espresso price together
 # H0: slope of Adjusted Rating = 0 given espresso price   H1: differs from 0 (two-tailed)
 # ============================================================
 cat("\n\n=========== A8 ===========\n")
 d8 <- d[!is.na(d$cappuccino) & !is.na(d$adj_rating) & !is.na(d$espresso), ]; n8 <- nrow(d8)
-m8a <- lm(cappuccino ~ adj_rating, data = d8)                  # same cafes as the full model
-m8b <- lm(cappuccino ~ adj_rating + espresso, data = d8)
-bpa <- lmtest::bptest(m8a)$p.value; bpb <- lmtest::bptest(m8b)$p.value
-rta <- reg_table(m8a, if (bpa < .05) sandwich::vcovHC(m8a, type = "HC3") else vcov(m8a))
-rtb <- reg_table(m8b, if (bpb < .05) sandwich::vcovHC(m8b, type = "HC3") else vcov(m8b))
-sh(rtb$tab); write_tex(rtb$tab, "A8_table"); write_tex(rta$tab, "A8_simple_table")
+m8 <- lm(cappuccino ~ adj_rating + espresso, data = d8)      # Adjusted Rating and espresso price together
+bp8 <- lmtest::bptest(m8)$p.value; rob8 <- bp8 < .05
+vc8 <- if (rob8) sandwich::vcovHC(m8, type = "HC3") else vcov(m8)
+rt8 <- reg_table(m8, vc8); sh(rt8$tab); write_tex(rt8$tab, "A8_table")
+b8 <- rt8$est["adj_rating"]
+b_simple <- coef(lm(cappuccino ~ adj_rating, data = d8))["adj_rating"]   # slope without espresso price (as in A7)
+remain <- 100 * b8 / b_simple
+cat("Adjusted Rating slope with espresso price:", b8, "| without:", b_simple, "| share that remains:", remain, "%\n")
 vif8 <- 1 / (1 - summary(lm(adj_rating ~ espresso, data = d8))$r.squared)
-sw8 <- shapiro.test(resid(m8b))$p.value; cd8 <- inf_cooks(m8b)
-before <- rta$est["adj_rating"]; after <- rtb$est["adj_rating"]
-cat("Slope before:", before, " after:", after, " remaining:", 100 * after / before, "%\n")
-write_tex(data.frame(Check = c("Breusch-Pagan, simple / multiple model", "Standard errors (simple / multiple)",
-                               "VIF of Adjusted Rating", "Shapiro-Wilk on residuals",
-                               "Influential cafes (Cook's D > 4/n)", "Cafes lost to missing values"),
-  Result = c(paste0("p = ", pplain(bpa), " / ", pplain(bpb)),
-             paste(if (bpa < .05) "HC3" else "classical", "/", if (bpb < .05) "HC3" else "classical"),
-             f2(vif8), paste0("p = ", pplain(sw8)),
-             if (length(cd8)) paste(cd8, collapse = ", ") else "none", N - n8)), "A8_checks")
-save_diag(m8b, "A8_diag")
-cdf <- data.frame(model = factor(c("Without espresso price", "With espresso price"),
-                                 levels = c("Without espresso price", "With espresso price")),
-                  est = c(before, after), lo = c(rta$lo["adj_rating"], rtb$lo["adj_rating"]),
-                  hi = c(rta$hi["adj_rating"], rtb$hi["adj_rating"]))
-fig <- ggplot(cdf, aes(model, est)) + geom_hline(yintercept = 0, linetype = "dashed") +
-  geom_pointrange(aes(ymin = lo, ymax = hi), colour = "red") +
-  labs(x = NULL, y = "Slope of Adjusted Rating (CZK per rating point)")
+sw8 <- shapiro.test(resid(m8))$p.value; cd8 <- inf_cooks(m8)
+write_tex(data.frame(Check = c("Breusch-Pagan (constant variance)", "Standard errors", "VIF of Adjusted Rating",
+                               "Shapiro-Wilk on residuals", "Influential cafes (Cook's D > 4/n)",
+                               "Slope without espresso price (as in A7), CZK", "Share of that slope that remains",
+                               "Cafes lost to missing values"),
+  Result = c(paste0("p = ", pplain(bp8)), if (rob8) "HC3 robust" else "classical", f2(vif8),
+             paste0("p = ", pplain(sw8)), if (length(cd8)) paste(cd8, collapse = ", ") else "none",
+             f1(b_simple), paste0(f1(remain), "%"), N - n8)), "A8_checks")
+save_diag(m8, "A8_diag")
+# figure: Adjusted Rating and cappuccino price, each after removing what espresso price explains
+# (the slope of this line is the Adjusted Rating coefficient of the multiple regression)
+av <- data.frame(x = resid(lm(adj_rating ~ espresso, data = d8)), y = resid(lm(cappuccino ~ espresso, data = d8)))
+fig <- ggplot(av, aes(x, y)) + geom_point(alpha = .6) +
+  geom_smooth(method = "lm", formula = y ~ x, colour = "red", fill = "red", alpha = .15) +
+  labs(x = "Adjusted Rating given espresso price (points)", y = "Cappuccino price given espresso price (CZK)")
 save_fig(fig, "A8_figure")
-s8 <- paste0("$t(", rtb$df, ")=", f2(after / rtb$se["adj_rating"]), "$")
-add_sum("A8", paste0("OLS, two predictors", if (bpb < .05) " (HC3 SE)" else ""),
-        paste0(f1(after), " CZK per point (was ", f1(before), "; ", f1(100 * after / before), "% remains)"),
-        ci_str(rtb$lo["adj_rating"], rtb$hi["adj_rating"], f1),
-        paste0("$R^2=", sub("^0", "", f2(summary(m8b)$r.squared)), "$"), s8, pfmt(rtb$p["adj_rating"]), n8, N - n8)
+s8 <- paste0("$t(", rt8$df, ")=", f2(b8 / rt8$se["adj_rating"]), "$")
+add_sum("A8", paste0("Multiple regression (OLS)", if (rob8) ", HC3 SE" else ""),
+        paste(f1(b8), "CZK per rating point"),
+        ci_str(rt8$lo["adj_rating"], rt8$hi["adj_rating"], f1),
+        paste0("$R^2=", sub("^0", "", f2(summary(m8)$r.squared)), "$"), s8, pfmt(rt8$p["adj_rating"]), n8, N - n8)
 
 # ============================================================
 # A9  Interaction: does the rating-price slope differ between roasteries and other cafes?
@@ -363,13 +362,13 @@ add_sum("A9", paste0("OLS with interaction", if (rob9) " (HC3 SE)" else ""),
 
 # ============================================================
 # A10  Logistic regression: flat white above the median vs Adjusted Rating
-# H0: coefficient of Adjusted Rating (per 0.1) = 0   H1: > 0 (one-tailed, "more likely in better-rated cafes")
+# H0: coefficient of Adjusted Rating (per 0.1) = 0   H1: coefficient differs from 0 (two-tailed)
 # ============================================================
 cat("\n\n=========== A10 ===========\n")
 d10 <- d[!is.na(d$above_med_flatwhite) & !is.na(d$adj_rating_tenth), ]; n10 <- nrow(d10)
 m10 <- glm(above_med_flatwhite ~ adj_rating_tenth, data = d10, family = binomial)
 cf <- summary(m10)$coefficients; b10 <- cf["adj_rating_tenth", 1]; se10 <- cf["adj_rating_tenth", 2]
-z10 <- cf["adj_rating_tenth", 3]; p10 <- pnorm(z10, lower.tail = FALSE)        # one-tailed
+z10 <- cf["adj_rating_tenth", 3]; p10 <- cf["adj_rating_tenth", 4]          # two-tailed Wald test
 or10 <- exp(b10 + c(-1, 1) * qnorm(.975) * se10)
 # average marginal effect (percentage points per 0.1) with delta-method CI
 ame_fun <- function(par) {
@@ -382,7 +381,7 @@ ame <- ame_fun(par_hat); se_ame <- sqrt(as.numeric(t(grad) %*% V %*% grad))
 ame_ci <- 100 * (ame + c(-1, 1) * qnorm(.975) * se_ame)
 A10 <- data.frame(`AME (pp per 0.1)` = f2(100 * ame), `95% CI` = ci_str(ame_ci[1], ame_ci[2]),
                   `Odds ratio` = f2(exp(b10)), `OR 95% CI` = ci_str(or10[1], or10[2]),
-                  Test = paste0("$z=", f2(z10), "$"), p = paste(pfmt(p10), "(one-tailed)"), n = n10,
+                  Test = paste0("$z=", f2(z10), "$"), p = pfmt(p10), n = n10,
                   check.names = FALSE)
 sh(A10); write_tex(A10, "A10_table")
 m10q <- glm(above_med_flatwhite ~ adj_rating_tenth + I(adj_rating_tenth^2), data = d10, family = binomial)
@@ -414,4 +413,55 @@ add_sum("A10", "Logit + average marginal effect", paste(f2(100 * ame), "pp per 0
 cat("\n\n=========== Summary of all analyses ===========\n")
 options(width = 220); sh(SUM)
 write_tex(SUM, "S_table", align = "lllllllrr")
+
+# ============================================================
+# Numbers for the report (numbers.tex): every number quoted in the text of the
+# report is written here as a LaTeX macro, so the text always matches this analysis.
+# ============================================================
+NUM <- list()
+num <- function(name, value) NUM[[name]] <<- as.character(value)
+words <- c("One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten")
+for (i in seq_len(nrow(SUM))) {                                  # the summary table, one macro per cell
+  w <- paste0("A", words[i])
+  num(paste0(w, "Method"), SUM$Method[i]);       num(paste0(w, "Est"), SUM$Estimate[i])
+  num(paste0(w, "CI"), SUM[["95% CI"]][i]);      num(paste0(w, "Eff"), SUM[["Effect size"]][i])
+  num(paste0(w, "Test"), SUM$Test[i]);           num(paste0(w, "P"), SUM$p[i])
+  num(paste0(w, "N"), SUM$n[i]);                 num(paste0(w, "Lost"), SUM$Lost[i])
+}
+num("ATotal", N)
+num("AOneBench", f1(bench)); num("AOneRate", f2(usd_czk)); num("AOneDiff", f1(est1 - bench))
+num("ATwoNRoast", length(x1)); num("ATwoNOther", length(x0))
+num("ATwoMeanRoast", f1(mean(x1))); num("ATwoMeanOther", f1(mean(x0))); num("ATwoLevene", pfmt(lev2))
+num("AThreeMedian", f1(median(d3$fw_minus_cap))); num("AThreeSame", sum(d3$fw_minus_cap == 0))
+num("AThreePct", f1(100 * est3 / mean(d$cappuccino, na.rm = TRUE)))
+for (i in 1:3) {                                                 # A4 group means
+  nm <- c("Ind", "Loc", "Int")[i]
+  num(paste0("AFourN", nm), gc$n[i]); num(paste0("AFourMean", nm), f1(gc$mean[i]))
+  num(paste0("AFourCI", nm), ci_str(gc$lo[i], gc$hi[i], f1))
+}
+num("AFourLevene", pfmt(lev4))
+if (par4) for (i in 1:3) {                                       # A4 pairwise (Independent-Local, Independent-Intl, Local-Intl)
+  nm <- c("One", "Two", "Three")[i]
+  num(paste0("AFourPair", nm, "Diff"), f1(ph$diff[i]))
+  num(paste0("AFourPair", nm, "CI"), ci_str(ph$lo[i], ph$hi[i], f1))
+  num(paste0("AFourPair", nm, "P"), pfmt(ph$p_adj[i]))
+}
+num("AFiveYesOne", tab5[1, 1]); num("AFiveNOne", sum(tab5[1, ])); num("AFivePctOne", f1(100 * tab5[1, 1] / sum(tab5[1, ])))
+num("AFiveYesTwo", tab5[2, 1]); num("AFiveNTwo", sum(tab5[2, ])); num("AFivePctTwo", f1(100 * tab5[2, 1] / sum(tab5[2, ])))
+num("AFiveMedian", f1(median(d$flatwhite, na.rm = TRUE))); num("AFiveMinExp", f1(min_exp))
+num("AFiveStdRes", f2(max(abs(ct5$stdres))))
+num("ASevenPerTenth", f1(b7 / 10)); num("ASevenBP", pfmt(bp7)); num("ASevenSW", pfmt(sw7)); num("ASevenCook", length(cd7))
+num("AEightSimple", f1(b_simple)); num("AEightRemain", f1(remain)); num("AEightVIF", f2(vif8))
+num("AEightEsp", f2(rt8$est["espresso"])); num("AEightEspCI", ci_str(rt8$lo["espresso"], rt8$hi["espresso"]))
+num("AEightEspP", pfmt(rt8$p["espresso"]))
+num("AEightBP", pfmt(bp8)); num("AEightSW", pfmt(sw8)); num("AEightCook", length(cd8))
+h9 <- qt(.975, m9$df.residual)
+num("ANineSlopeOther", f1(s_oth)); num("ANineSlopeOtherCI", ci_str(s_oth - h9 * se_oth, s_oth + h9 * se_oth, f1))
+num("ANineSlopeRoast", f1(s_roa)); num("ANineSlopeRoastCI", ci_str(s_roa - h9 * se_roa, s_roa + h9 * se_roa, f1))
+num("ANineRoast", sum(d9$grp == "Roastery")); num("ANineInt", f1(int_est))
+num("ANineBP", pfmt(bp9)); num("ANineSW", pfmt(sw9)); num("ANineCook", length(cd9))
+num("ATenOR", f2(exp(b10))); num("ATenORCI", ci_str(or10[1], or10[2])); num("ATenEvents", epv)
+num("ATenLin", pfmt(lin_p)); num("ATenCook", length(cd10)); num("ATenMcf", f2(mcf))
+writeLines(vapply(names(NUM), function(k) paste0("\\newcommand{\\", k, "}{", tex_safe(NUM[[k]]), "}"), character(1)),
+           "../report/tables/numbers.tex")
 cat("\nAll tables and figures saved in ../report/\n")

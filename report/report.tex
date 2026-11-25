@@ -8,13 +8,18 @@
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{placeins} % Prevent floats from crossing section boundaries
 \usepackage{adjustbox}
 \usepackage[font=small,labelfont=bf]{caption}
 \usepackage[colorlinks=true,linkcolor=black,urlcolor=blue]{hyperref}
 
-% ---------- Safe loaders ----------
-% These show a gray "missing file" box instead of crashing,
-% so the report compiles before your R scripts have produced every file.
+% ---------- Numbers written by 03_analysis.R ----------
+% Every number quoted in the text is a macro defined in tables/numbers.tex,
+% so the text always matches the analysis. Run the three R scripts first.
+\IfFileExists{tables/numbers.tex}{\input{tables/numbers.tex}}%
+  {\errmessage{tables/numbers.tex is missing: run 03_analysis.R first}}
+
+% ---------- Safe loaders (a grey box instead of a crash if a file is missing) ----------
 \newcommand{\safetable}[1]{%
   \IfFileExists{#1}{\input{#1}}{\fbox{Missing table file: \detokenize{#1}}}}
 \newcommand{\safetablew}[1]{%
@@ -22,69 +27,49 @@
 \newcommand{\safefigure}[2][0.85]{%
   \IfFileExists{#2}{\includegraphics[width=#1\textwidth]{#2}}%
   {\fbox{Missing figure file: \detokenize{#2}}}}
-% diagnostics checks table for the appendix
-\newcommand{\checks}[2]{\begin{table}[ht]\centering\small
+\newcommand{\checks}[2]{\begin{table}[!htbp]\centering\small
   \safetablew{tables/#1_checks.tex}\caption{#2}\end{table}}
 
-% ---------- Reporting macros (same output format as the template) ----------
-% \meanci{mean}{lower}{upper}{unit}
-\newcommand{\meanci}[4]{$M = #1$~#4, 95\% CI [$#2$, $#3$]}
-% \diffci{diff}{lower}{upper}{unit}{d}{d lower}{d upper}
-\newcommand{\diffci}[7]{$M_{\Delta} = #1$~#4, 95\% CI [$#2$, $#3$], $d = #5$, 95\% CI [$#6$, $#7$]}
-% \tstat{df}{t}   \pval{.XXX}   \Fstat{df1}{df2}{F}
-\newcommand{\tstat}[2]{$t(#1) = #2$}
-\newcommand{\pval}[1]{$p = #1$}
-\newcommand{\Fstat}[3]{$F(#1, #2) = #3$}
-
 % ---------- Title ----------
-\title{
-\textbf{An Analysis of Coffee Prices and Café Characteristics in Prague}
-}
-\author{Keira McManus\\Introduction to Business Analytics\\Partner: Eden Rae Warner}
+\title{\textbf{An Analysis of Coffee Prices and Caf\'e Characteristics in Prague}}
+\author{Eden Rae Warner\\Data Analytics, Batch N\\Partner: Keira}
 \date{\today}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-We examine dine-in coffee prices in a convenience sample of 199 Prague caf\'es collected by students in autumn 2026, and ask how prices are related to caf\'e characteristics in ten analyses. The mean espresso price was 64.7~CZK, close to the equivalent of 3~US dollars (65.3~CZK; $p = .503$). Within the same caf\'e, a flat white cost on average 12.2~CZK more than a cappuccino (95\% CI [10.9, 13.6]). Caf\'es in Prague~1 were 27.7 percentage points more likely than caf\'es elsewhere to charge above the sample median for a flat white (95\% CI [13.7, 41.7]). Local chains charged 5.6~CZK more for a cappuccino than independent caf\'es, while the differences involving international chains, of which there were only ten, were not statistically clear. There was no clear evidence that roasteries charge more for an espresso (difference 3.3~CZK, 95\% CI [$-1.1$, 7.6]). Higher-rated caf\'es tended to charge slightly less for a cappuccino ($r = -.22$), but this association largely disappeared once the espresso price was taken into account. Because the data are a convenience sample and are observational, the findings describe associations among the sampled caf\'es. They cannot be generalised to all caf\'es in Prague or interpreted as causal effects.
+We examine dine-in coffee prices in a convenience sample of \ATotal{} Prague caf\'es collected by students in autumn 2026, and ask how prices are related to caf\'e characteristics in ten analyses. The mean espresso price was \AOneEst{} (95\% CI \AOneCI{}), compared with a benchmark of \AOneBench{}~CZK, the equivalent of 3~US dollars. Within the same caf\'e, a flat white cost on average \AThreeEst{} more than a cappuccino (95\% CI \AThreeCI{}). The share of caf\'es charging above the sample median for a flat white differed between Prague~1 and the rest of Prague by \AFiveEst{} (95\% CI \AFiveCI{}). Roasteries differed from other caf\'es in the mean espresso price by \ATwoEst{} (95\% CI \ATwoCI{}). Cappuccino prices differed across caf\'e types (\AFourTest{}, \AFourP{}). Cappuccino price and adjusted Google rating had a correlation of \ASixEst{} (95\% CI \ASixCI{}); after accounting for the espresso price, the adjusted rating coefficient was \AEightEst{} (95\% CI \AEightCI{}). Because the data are a convenience sample and are observational, the findings describe associations among the sampled caf\'es. They cannot be generalised to all caf\'es in Prague or interpreted as causal effects.
 \end{abstract}
-\\~\\
-\\~\\
-\\~\\
-\\\\
-\\~\\
-\\~\\
-\\~\\
-\\\\
-\\~\\
-\\~\\
 
 % =====================================================================
 \section{Introduction}
 
-What a caf\'e charges for a coffee depends on the costs of running the business and on what customers are willing to pay. Rents are generally higher in central Prague, caf\'es that roast their own beans may price differently from other caf\'es, and a caf\'e's reputation, as reflected in its Google rating, may also be related to its prices. This report examines coffee prices in a student-collected sample of 199 Prague caf\'es and asks how they are associated with caf\'e characteristics. Our topic is the price chapter of a larger story about the Prague caf\'e market, which also covers location, ratings, caf\'e size and specialty caf\'es.
+What a caf\'e charges for a coffee depends on the costs of running the business and on what customers are willing to pay. Rents are generally higher in central Prague, caf\'es that roast their own beans may price differently from other caf\'es, and a caf\'e's reputation, as reflected in its Google rating, may also be related to its prices. This report examines coffee prices in a student-collected sample of \ATotal{} Prague caf\'es and asks how they are associated with caf\'e characteristics. Our topic is the price chapter of a larger story about the Prague caf\'e market, which also covers location, ratings, caf\'e size and specialty caf\'es.
 
-We answer ten research questions, each with a different statistical method. We first describe the overall price level, asking whether the average espresso price differs from the equivalent of 3~US dollars (A1), and whether roasteries charge more for an espresso than other caf\'es (A2). We then ask how much more a flat white costs than a cappuccino in the same caf\'e (A3). Next we look at who charges more: whether cappuccino prices differ between independent caf\'es, local chains and international chains (A4), and whether caf\'es in Prague~1 are more likely than caf\'es elsewhere to charge above the median for a flat white (A5). Finally, we ask whether a caf\'e's adjusted Google rating is related to its prices. We examine the correlation between cappuccino price and adjusted rating (A6), the size of the association in a simple regression (A7), whether it remains after accounting for the espresso price (A8), whether it differs between roasteries and other caf\'es (A9), and whether higher-rated caf\'es are more likely to charge above the median for a flat white (A10).
+We answer ten research questions, each with a different statistical method. We first describe the overall price level, asking whether the average espresso price differs from the equivalent of 3~US dollars (A1), and whether roasteries charge more for an espresso than other caf\'es (A2). We then ask how much more a flat white costs than a cappuccino in the same caf\'e (A3). Next we look at who charges more: whether cappuccino prices differ between independent caf\'es, local chains and international chains (A4), and whether caf\'es in Prague~1 are more likely than caf\'es elsewhere to charge above the median for a flat white (A5). Finally, we ask whether a caf\'e's adjusted Google rating is related to its prices. We examine the correlation between cappuccino price and adjusted rating (A6), the size of the association in a simple regression (A7), whether it remains in a multiple regression that also includes the espresso price (A8), whether it differs between roasteries and other caf\'es (A9), and whether the probability of an above-median flat white price changes with the adjusted rating (A10).
 
 % =====================================================================
+\FloatBarrier
 \section{Data and Methods}
 
+\FloatBarrier
 \subsection{Data}
 
-The data were collected by students in the course in autumn 2026. Students visited caf\'es in Prague in person and recorded dine-in coffee prices, seating, Google ratings and caf\'e characteristics in a shared spreadsheet. The sample is a convenience sample, not a random sample of Prague caf\'es. The raw file contained 300 rows, of which 99 were empty and were removed, leaving 201 non-empty rows. Rows that repeated the same caf\'e (the same name and address entered more than once, for example Republica Coffee) were treated as repeated entries of one caf\'e and only the first entry was kept. The cleaned data set contains 199 caf\'es.
+The data were collected by students on the course in autumn 2026. Students visited caf\'es in Prague in person and recorded dine-in coffee prices, seating, Google ratings and caf\'e characteristics in a shared spreadsheet. The sample is a convenience sample, not a random sample of Prague caf\'es. The raw file contained 300 rows, of which 99 were empty and were removed. The sheet also contained the professor's example row, which was not collected by a student, and we removed it.
+
+Eleven caf\'es had been entered twice by different students: the caf\'e name was the same apart from its spelling and the coordinates were within about 30~metres of each other. For each of them we kept the first entry in the sheet and removed the second. Other entries with very close coordinates, such as several caf\'es in the same building or different branches of one chain, are different caf\'es and were kept. After these steps the data contain \ATotal{} caf\'es.
 
 All cleaning was done in the R script \texttt{01\_cleaning.R}, which reads the raw file, never edits it by hand and writes the cleaned data set \texttt{dataset.csv}. The cleaning involved the following choices.
 \begin{itemize}
   \item \textbf{District labels} were harmonised (for example ``prague~1'' and ``prauge~1'' both became ``Prague~1'').
   \item \textbf{Caf\'e type.} Labels were standardised and a blank caf\'e type was set to missing.
-  \item \textbf{Number of ratings.} Thousands separators (commas) were removed from the number of Google ratings after checking that this was the only non-numeric content of that column (six caf\'es were affected).
-  \item \textbf{Prices with several values.} Where a price cell contained several values (for example ``85, 95, 105'' or ``65/40''), the first listed value was kept. This affected 12 espresso prices, 12 cappuccino prices and three flat white prices. A different rule, such as setting these cells to missing, could change the results slightly.
+  \item \textbf{Number of ratings.} Thousands separators (commas) were removed from the number of Google ratings after checking that this was the only non-numeric content of that column.
+  \item \textbf{Prices with several values.} Where a price cell contained several values (for example ``85, 95, 105'' or ``65/40''), the first listed value was kept. A different rule, such as setting these cells to missing, could change the results slightly.
   \item \textbf{Missing prices.} A missing price was treated as a caf\'e that does not serve that drink. Missing values were kept as missing and were never replaced by zero.
   \item \textbf{Original values.} Every recoded or converted variable was stored in a new column, and the original column was kept for comparison.
 \end{itemize}
-
-No espresso or cappuccino prices are missing. Two flat white prices, one caf\'e type and four Google ratings are missing, among others. The number of caf\'es used in each analysis depends on the variables it needs, and the sample size and the number of caf\'es lost to missing values are reported with every result.
+The number of caf\'es used in each analysis depends on the variables it needs. The sample size and the number of caf\'es lost to missing values are reported with every result (Table~\ref{tab:summary}).
 
 Several variables were constructed in R.
 \begin{itemize}
@@ -94,20 +79,21 @@ Several variables were constructed in R.
   \]
   where $R$ is the caf\'e's Google rating, $n$ its number of Google ratings and $C$ the mean Google rating of all caf\'es in the data set. This shrinks ratings based on few reviews towards the mean. It is computed only for caf\'es with both a rating and a number of ratings; no value was imputed for the others.
   \item \textbf{Prague~1 indicator} (1 if the district is Prague~1, 0 otherwise).
-  \item \textbf{Flat white above the median.} The indicator is 1 if a caf\'e's flat white price is strictly above the median flat white price of all caf\'es (95~CZK, computed in code) and 0 otherwise. Caf\'es priced exactly at the median count as not above.
-  \item \textbf{Adjusted Rating per 0.1} (the Adjusted Rating divided by 0.1), so that the logistic regression effect refers to a step of 0.1 rating points.
+  \item \textbf{Flat white above the median.} The indicator is 1 if a caf\'e's flat white price is strictly above the median flat white price of all caf\'es (\AFiveMedian{}~CZK, computed in code) and 0 otherwise. Caf\'es priced exactly at the median count as not above.
+  \item \textbf{Adjusted Rating per 0.1} (the Adjusted Rating divided by 0.1), so that the logistic regression refers to a step of 0.1 rating points.
   \item \textbf{Flat white minus cappuccino}, the within-caf\'e price difference, defined only where both prices exist.
 \end{itemize}
 
-For A1, the benchmark of 3~US dollars was converted at 21.76~CZK per US dollar (the Czech National Bank rate of 3~November 2026), which gives a benchmark of 65.3~CZK.
+For A1, the benchmark of 3~US dollars was converted at \AOneRate{}~CZK per US dollar (the Czech National Bank rate of 3~November 2026), which gives a benchmark of \AOneBench{}~CZK.
 
+\FloatBarrier
 \subsection{Statistical Methods}
 
-All analyses were done in R using the packages \texttt{ggplot2}, \texttt{sandwich} and \texttt{lmtest}. We used a significance level of $\alpha = .05$ throughout. The hypotheses for each question, including the direction of every one-tailed alternative, were written before the data were analysed. A one-tailed alternative was used only where the question names a direction (A2, A3, A5 and A10); one-tailed $p$-values are labelled as such, and the confidence intervals shown are always two-sided. The remaining analyses are two-tailed. Anything not planned in advance is labelled as exploratory.
+All analyses were done in R using the packages \texttt{ggplot2}, \texttt{sandwich} and \texttt{lmtest}. We used a significance level of $\alpha = .05$ throughout. The hypotheses for each question, including the direction of every one-tailed alternative, were written before the data were analysed. A one-tailed alternative was used only where the question names a direction (A2, A3 and A5); one-tailed $p$-values are labelled as such, and the confidence intervals shown are always two-sided. All other analyses, including A10, are two-tailed. Anything not planned in advance is labelled as exploratory.
 
-\paragraph{Choosing between parametric and non-parametric methods.} Before any test, we described every variable and every compared group (script \texttt{02\_descriptive.R}). Normality was judged within each group from histograms, normal Q--Q plots and skewness; a variable was treated as approximately normal if the absolute skewness was at most 0.5. The Shapiro--Wilk test is reported only as additional information. If normality was not met, we checked whether the central limit theorem applies: the group had to contain at least 30 caf\'es and the distribution of 5{,}000 bootstrapped means (random seed 2026) had to show no clear skewness. A parametric test was justified if either condition held. All variables met this criterion, so we used parametric methods throughout. For the roastery group (23 caf\'es) and the international chains (10 caf\'es) this rests on approximate normality alone, because these groups are too small for the central limit theorem, which limits the power of the corresponding tests.
+\paragraph{Choosing between parametric and non-parametric methods.} Before any test, we described every variable and every compared group (script \texttt{02\_descriptive.R}). Normality was judged within each group from histograms, normal Q--Q plots and skewness; a variable was treated as approximately normal if the absolute skewness was at most 0.5. The Shapiro--Wilk test is reported only as additional information. If normality was not met, we checked whether the central limit theorem applies: the group had to contain at least 30 caf\'es and the distribution of 5{,}000 bootstrapped means (random seed 2026) had to show no clear skewness. A parametric test was justified if either condition held, and otherwise a non-parametric test was needed. The resulting decision for every variable and group is in Table~\ref{tab:dtable} (Appendix~B). For small groups, such as the roasteries and the international chains, this rests on approximate normality alone, which limits the power of the corresponding tests.
 
-\paragraph{Estimates and effect sizes.} Means are reported with 95\% confidence intervals and sample sizes. In A1 a percentile bootstrap interval (5{,}000 resamples, seed 2026) was used because espresso prices are not normally distributed. Group differences are stated with the direction of subtraction. We report Cohen's $d$ for the one-sample and two-group comparisons and $d_z$ for the paired comparison. Cram\'er's $V$ is reported for the contingency table, and the correlation coefficient and $R^2$ serve as effect sizes in the correlation and regression analyses.
+\paragraph{Estimates and effect sizes.} Means are reported with 95\% confidence intervals and sample sizes. In A1 a percentile bootstrap interval (5{,}000 resamples, seed 2026) is used when the normal approximation is doubtful. Group differences are stated with the direction of subtraction. We report Cohen's $d$ for the one-sample and two-group comparisons and $d_z$ for the paired comparison. Cram\'er's $V$ is reported for the contingency table, and the correlation coefficient, $R^2$ and the average marginal effect serve as effect sizes in the correlation and regression analyses.
 
 \paragraph{Tests.}
 \begin{itemize}
@@ -117,53 +103,57 @@ All analyses were done in R using the packages \texttt{ggplot2}, \texttt{sandwic
   \item \textbf{A4} Welch's ANOVA for cappuccino prices across the three caf\'e types, followed by Games--Howell pairwise comparisons, which adjust for multiple comparisons. Levene's test was used to check equality of variances.
   \item \textbf{A5} Chi-square test of independence between Prague~1 location and a flat white price above the median, with the difference in percentages (Prague~1 minus elsewhere) and its confidence interval from a two-proportion test, and Cram\'er's $V$. The one-tailed $p$-value is taken from the equivalent one-sided test of proportions. Expected counts were checked, and Fisher's exact test was to be used if any were below 5. Standardised residuals show which cells drive the association.
   \item \textbf{A6} Pearson's correlation between cappuccino price and Adjusted Rating, with a 95\% confidence interval and $r^2$ (two-tailed).
-  \item \textbf{A7--A9} Linear regression by ordinary least squares: a simple regression of cappuccino price on Adjusted Rating (A7); the same model with espresso price added, estimated on the same caf\'es so that the two slopes are comparable (A8); and a model with Adjusted Rating, roastery status and their interaction (A9). The slope in each group in A9 is a linear combination of the coefficients. Constant variance was tested with the Breusch--Pagan test, and heteroskedasticity-robust (HC3) standard errors were used where it was rejected. Residuals were inspected with residual-versus-fitted and Q--Q plots, supplemented by the Shapiro--Wilk test. Influential caf\'es were flagged with Cook's distance above $4/n$ and were not removed. The variance inflation factor was computed for A8. In A8 we report how much of the original slope remains after espresso price is added.
-  \item \textbf{A10} Logistic regression of the above-median flat white indicator on Adjusted Rating per 0.1 (one-tailed $z$-test of the coefficient). The main result is the average marginal effect in percentage points per 0.1 rating points, with a delta-method confidence interval; odds ratios are given as supporting results. Linearity of the logit was checked with a likelihood-ratio test for a quadratic term, and influential caf\'es were flagged with Cook's distance.
+  \item \textbf{A7--A9} Linear regression by ordinary least squares: a simple regression of cappuccino price on Adjusted Rating (A7); a multiple regression of cappuccino price on Adjusted Rating and espresso price together (A8); and a model with Adjusted Rating, roastery status and their interaction (A9). The slope in each group in A9 is a linear combination of the coefficients. Constant variance was tested with the Breusch--Pagan test, and heteroskedasticity-robust (HC3) standard errors were used where it was rejected. Residuals were inspected with residual-versus-fitted and Q--Q plots, supplemented by the Shapiro--Wilk test. Influential caf\'es were flagged with Cook's distance above $4/n$ and were not removed. The variance inflation factor was computed for A8, and for A8 we also report how much of the A7 slope remains once espresso price is in the model.
+  \item \textbf{A10} Logistic regression of the above-median flat white indicator on Adjusted Rating per 0.1 (two-tailed Wald $z$-test of the coefficient). The main result is the average marginal effect in percentage points per 0.1 rating points, with a delta-method confidence interval; odds ratios are given as supporting results. Linearity of the logit was checked with a likelihood-ratio test for a quadratic term, and influential caf\'es were flagged with Cook's distance.
 \end{itemize}
 
 \paragraph{Limits.} The data are observational and come from a convenience sample, so results describe the sampled caf\'es and are not causal. Caf\'es in the same district share rents, customers and local conditions, so their prices are not independent. This can make standard errors and confidence intervals too narrow, and it affects every test above that assumes independence. We did not model this clustering. We ran ten primary tests, so some significant results could arise by chance.
 
 % =====================================================================
+\FloatBarrier
 \section{Results}
 
-Table~\ref{tab:summary} summarises the main result of each of the ten analyses; the sections below give the hypotheses, the method and the interpretation of each. One-tailed $p$-values (A2, A3, A5 and A10) are labelled as such. Every analysis reports the number of caf\'es used ($n$) and the number lost to missing values.
+Table~\ref{tab:summary} summarises the main result of each of the ten analyses; the sections below give the hypotheses, the method and the interpretation of each. One-tailed $p$-values (A2, A3 and A5) are labelled as such. Every analysis reports the number of caf\'es used ($n$) and the number lost to missing values.
 
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering\small
   \safetablew{tables/S_table.tex}
   \caption{Summary of the ten analyses (estimate, 95\% confidence interval, effect size, test, $p$-value, number of caf\'es used $n$, and caf\'es lost to missing values).}
   \label{tab:summary}
 \end{table}
 
-
+% ---------------------------------------------------------------------
+\FloatBarrier
 \subsection{A1: Mean espresso price compared with 3 US dollars}
 
 \textbf{Question.} Is the average price of an espresso in Prague different from 3 US dollars?
 
 \textbf{Hypotheses.}
 \begin{itemize}
-  \item $H_0$: the mean espresso price equals the benchmark, $\mu = 65.3$~CZK (3~USD $\times$ 21.76~CZK/USD, CNB rate of 3~November 2026).
-  \item $H_1$: the mean espresso price differs from the benchmark, $\mu \neq 65.3$~CZK (two-tailed).
+  \item $H_0$: the mean espresso price equals the benchmark, $\mu = \AOneBench{}$~CZK (3~USD $\times$ \AOneRate{}~CZK/USD).
+  \item $H_1$: the mean espresso price differs from the benchmark (two-tailed).
 \end{itemize}
 
-\textbf{Method.} A one-sample $t$-test. Espresso prices are not normally distributed, but the sample is large enough for the central limit theorem to apply (Appendix~B), so a parametric test was justified. Because the normal approximation is doubtful, the confidence interval is a percentile bootstrap interval (5{,}000 resamples, seed 2026). All 199 caf\'es have an espresso price.
+\textbf{Method.} A one-sample $t$-test, justified by the descriptive table (Appendix~B). Where the normal approximation is doubtful the confidence interval is a percentile bootstrap interval.
 
-\textbf{Results.} The mean espresso price was 64.7~CZK (95\% CI [63.0, 66.5], $n = 199$), about 0.6~CZK below the benchmark. The test was not significant, $t(198) = -0.67$, $p = .503$, with a negligible effect size ($d = -0.05$).
+\textbf{Results.} The mean espresso price was \AOneEst{} (95\% CI \AOneCI{}, $n = \AOneN{}$), a difference of \AOneDiff{}~CZK from the benchmark. The test gave \AOneTest{}, \AOneP{}, with an effect size of \AOneEff{}.
 
-\textbf{Interpretation.} The benchmark of 65.3~CZK lies inside the interval, so there is no evidence that the average espresso price in this sample differs from 3~USD. A difference of half a crown is also of no practical importance. The conclusion depends on the exchange rate: a rate several crowns away would move the benchmark and could change the result.
+\textbf{Interpretation.} The benchmark lies inside the confidence interval, so there is no evidence that the average espresso price in this sample differs from 3~USD, and a difference of this size is of no practical importance. The conclusion depends on the exchange rate: a rate several crowns away would move the benchmark and could change the result.
 
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \safetablew{tables/A1_table.tex}
-  \caption{Mean espresso price compared with the benchmark of 3~USD (65.3~CZK). The interval is a percentile bootstrap interval.}
+  \caption{Mean espresso price compared with the benchmark of 3~USD. The interval is a percentile bootstrap interval where the normal approximation was doubtful.}
 \end{table}
 
-\begin{figure}[ht]
+\begin{figure}[!htbp]
   \centering
   \safefigure[0.7]{figures/A1_figure.pdf}
-  \caption{Distribution of espresso prices. The blue line and shaded band are the mean and its 95\% bootstrap interval; the dashed red line is the benchmark.}
+  \caption{Distribution of espresso prices. The blue line and shaded band are the mean and its 95\% interval; the dashed red line is the benchmark.}
 \end{figure}
 
+% ---------------------------------------------------------------------
+\FloatBarrier
 \subsection{A2: Espresso prices in roasteries and other caf\'es}
 
 \textbf{Question.} Do roasteries charge more for an espresso than other caf\'es?
@@ -174,24 +164,26 @@ Table~\ref{tab:summary} summarises the main result of each of the ten analyses; 
   \item $H_1$: roasteries charge more ($\mu_{\text{roastery}} > \mu_{\text{other}}$; one-tailed, fixed in advance). The difference is roasteries minus other caf\'es.
 \end{itemize}
 
-\textbf{Method.} Welch's two-sample $t$-test. Espresso prices in the roastery group are approximately normal, and in the other caf\'es the central limit theorem applies (Appendix~B). Levene's test gave $p = .172$; Welch's test was used regardless.
+\textbf{Method.} Welch's two-sample $t$-test, which does not assume equal variances. Levene's test gave \ATwoLevene{}; Welch's test was used regardless.
 
-\textbf{Results.} 23 roasteries and 176 other caf\'es were compared. Roasteries charged 3.3~CZK more on average (95\% CI [$-1.1$, 7.6]), $d = 0.26$, $t(34.34) = 1.51$, one-tailed $p = .070$.
+\textbf{Results.} \ATwoNRoast{} roasteries and \ATwoNOther{} other caf\'es were compared. The mean espresso price was \ATwoMeanRoast{}~CZK in roasteries and \ATwoMeanOther{}~CZK in other caf\'es. The difference (roasteries minus others) was \ATwoEst{} (95\% CI \ATwoCI{}), \ATwoEff{}, \ATwoTest{}, \ATwoP{} (one-tailed).
 
-\textbf{Interpretation.} The difference is small, and the one-tailed $p$-value is above $\alpha = .05$, so there is no evidence in this sample that roasteries charge more for an espresso. This does not show there is no premium. The interval includes zero but also premiums of up to about 8~CZK, and with only 23 roasteries the test has little power. The two-sided interval is shown even though the test is one-tailed.
+\textbf{Interpretation.} The one-tailed $p$-value is above $\alpha = .05$, so there is no evidence in this sample that roasteries charge more for an espresso. This does not show that there is no premium: the interval includes zero but also premiums of several crowns, and with so few roasteries the test has little power. The two-sided interval is shown even though the test is one-tailed.
 
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \safetablew{tables/A2_table.tex}
   \caption{Difference in mean espresso price, roasteries minus other caf\'es, with Welch's $t$-test. The $p$-value is one-tailed.}
 \end{table}
 
-\begin{figure}[ht]
+\begin{figure}[!htbp]
   \centering
   \safefigure[0.6]{figures/A2_figure.pdf}
   \caption{Espresso prices in roasteries and other caf\'es. Points are individual caf\'es; red marks show group means with 95\% confidence intervals.}
 \end{figure}
 
+% ---------------------------------------------------------------------
+\FloatBarrier
 \subsection{A3: Flat white versus cappuccino prices}
 
 \textbf{Question.} How much more does a flat white cost than a cappuccino in the same caf\'e?
@@ -202,93 +194,97 @@ Table~\ref{tab:summary} summarises the main result of each of the ten analyses; 
   \item $H_1$: the flat white is more expensive, $\mu_d > 0$ (one-tailed, fixed in advance).
 \end{itemize}
 
-\textbf{Method.} A paired $t$-test. The differences are not normal, but the sample is large (Appendix~B), so a parametric test was justified. 197 caf\'es have both prices; two were excluded because of a missing price.
+\textbf{Method.} A paired $t$-test, because both prices were recorded in the same caf\'e. Only caf\'es with both prices are included ($n = \AThreeN{}$; \AThreeLost{} lost to a missing price).
 
-\textbf{Results.} On average a flat white cost 12.2~CZK more than a cappuccino in the same caf\'e (95\% CI [10.9, 13.6]), $d_z = 1.29$, $t(196) = 18.10$, one-tailed $p < .001$. The median difference was 10~CZK. Seven caf\'es charged the same price for both drinks, and a few charged less for a flat white (the differences range from $-35$ to $+60$~CZK).
+\textbf{Results.} On average a flat white cost \AThreeEst{} more than a cappuccino in the same caf\'e (95\% CI \AThreeCI{}), \AThreeEff{}, \AThreeTest{}, \AThreeP{} (one-tailed). The median difference was \AThreeMedian{}~CZK, and \AThreeSame{} caf\'es charged the same price for both drinks.
 
-\textbf{Interpretation.} In this sample a flat white costs about 12~CZK more than a cappuccino, roughly 15\% of the average cappuccino price (82.7~CZK). The effect is very large in statistical terms because almost all caf\'es charge a similar premium, and a difference of this size is noticeable to customers.
+\textbf{Interpretation.} In this sample a flat white costs about \AThreeMedian{} to \AThreeEst{} more than a cappuccino, roughly \AThreePct{}\% of the average cappuccino price. The effect is very large in statistical terms because almost all caf\'es charge a similar premium, and a difference of this size is noticeable to customers.
 
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \safetablew{tables/A3_table.tex}
   \caption{Mean within-caf\'e difference between flat white and cappuccino prices (paired $t$-test; the $p$-value is one-tailed).}
 \end{table}
 
-\begin{figure}[ht]
+\begin{figure}[!htbp]
   \centering
   \safefigure[0.7]{figures/A3_figure.pdf}
   \caption{Within-caf\'e differences (flat white minus cappuccino). The blue line and shaded band are the mean and its 95\% interval; the dashed line marks zero.}
 \end{figure}
 
+% ---------------------------------------------------------------------
+\FloatBarrier
 \subsection{A4: Cappuccino price by caf\'e type}
 
 \textbf{Question.} Does the price of a cappuccino differ by caf\'e type (independent, local chain, international chain), and if so, how?
 
 \textbf{Hypotheses.}
 \begin{itemize}
-  \item $H_0$: the mean cappuccino price is the same in all three caf\'e types ($\mu_{\text{independent}} = \mu_{\text{local}} = \mu_{\text{international}}$).
+  \item $H_0$: the mean cappuccino price is the same in all three caf\'e types.
   \item $H_1$: at least one caf\'e type has a different mean cappuccino price (two-tailed).
 \end{itemize}
 
-\textbf{Method.} Cappuccino prices are approximately normal in the independent and international groups and large enough for the central limit theorem to apply in the local-chain group (Appendix~B), so a parametric method was used. Levene's test indicated unequal variances across the caf\'e types ($p < .001$), so we used Welch's ANOVA, followed by Games--Howell pairwise comparisons, which adjust for multiple comparisons and do not assume equal variances. One caf\'e with a missing caf\'e type was excluded ($n = 198$).
+\textbf{Method.} Welch's ANOVA, followed by Games--Howell pairwise comparisons, which adjust for multiple comparisons and do not assume equal variances. Levene's test gave \AFourLevene{}. Caf\'es with a missing caf\'e type are excluded ($n = \AFourN{}$).
 
-\textbf{Results.} The mean cappuccino price was 80.4~CZK in independent caf\'es ($n = 138$, 95\% CI [78.2, 82.6]), 86.0~CZK in local chains ($n = 50$, [82.3, 89.8]) and 97.0~CZK in international chains ($n = 10$, [76.7, 117.3]). The overall test was significant, $F(2, 22.19) = 4.62$, $p = .021$, so there is evidence that mean cappuccino prices are not equal across the three caf\'e types.
-
-The pairwise comparisons show where this difference comes from:
+\textbf{Results.} The mean cappuccino price was \AFourMeanInd{}~CZK in independent caf\'es ($n = \AFourNInd{}$, 95\% CI \AFourCIInd{}), \AFourMeanLoc{}~CZK in local chains ($n = \AFourNLoc{}$, \AFourCILoc{}) and \AFourMeanInt{}~CZK in international chains ($n = \AFourNInt{}$, \AFourCIInt{}). The overall test gave \AFourTest{}, \AFourP{}. The pairwise comparisons (first group minus second) were:
 \begin{itemize}
-  \item \textbf{Independent versus local chain.} Independent caf\'es charged 5.6~CZK less than local chains (95\% CI [$-10.8$, $-0.4$], adjusted $p = .030$). This is the only significant pair.
-  \item \textbf{Independent versus international chain.} Independent caf\'es charged 16.6~CZK less on average (95\% CI [$-41.7$, 8.5], adjusted $p = .211$). This is not significant.
-  \item \textbf{Local versus international chain.} Local chains charged 11.0~CZK less on average (95\% CI [$-36.2$, 14.2], adjusted $p = .481$). This is not significant.
+  \item independent minus local chain: \AFourPairOneDiff{}~CZK (95\% CI \AFourPairOneCI{}), adjusted \AFourPairOneP{};
+  \item independent minus international chain: \AFourPairTwoDiff{}~CZK (95\% CI \AFourPairTwoCI{}), adjusted \AFourPairTwoP{};
+  \item local chain minus international chain: \AFourPairThreeDiff{}~CZK (95\% CI \AFourPairThreeCI{}), adjusted \AFourPairThreeP{}.
 \end{itemize}
 
-\textbf{Interpretation.} In this sample, local chains charge about 5.6~CZK, or roughly 7\%, more for a cappuccino than independent caf\'es, and this is the clearest difference. The interval is fairly wide, from almost no difference to about 11~CZK, so the size of the gap is uncertain. International chains have the highest mean price (97.0~CZK), but there are only 10 of them, so their mean is imprecise. The data give no evidence that international chains differ from independent caf\'es or from local chains, and this does not show that no difference exists: the intervals include large differences in either direction. The data therefore do not support a statement that international chains charge the most. As with all analyses here, this describes the sampled caf\'es, is not causal, and may be affected by caf\'es in the same district not being independent.
+\textbf{Interpretation.} The overall test indicates that mean cappuccino prices are not equal across the three caf\'e types. The comparison between independent caf\'es and local chains is the clearest difference; independent caf\'es charge less. The comparisons that involve the international chains have very wide intervals, because there are only \AFourNInt{} of them, so their mean is imprecise and the data cannot say whether they differ from the other types. A non-significant pairwise result does not show that there is no difference. As with all analyses here, this describes the sampled caf\'es and is not causal.
 
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \safetablew{tables/A4_table.tex}
   \caption{Mean cappuccino price by caf\'e type with 95\% confidence intervals, and the Welch ANOVA result.}
 \end{table}
 
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \safetablew{tables/A4_posthoc.tex}
   \caption{Games--Howell pairwise comparisons of cappuccino prices (difference in CZK, first group minus second) with 95\% confidence intervals and adjusted $p$-values.}
 \end{table}
 
-\begin{figure}[ht]
+\begin{figure}[!htbp]
   \centering
   \safefigure[0.7]{figures/A4_figure.pdf}
   \caption{Cappuccino prices by caf\'e type. Points are individual caf\'es; red marks show group means with 95\% confidence intervals.}
 \end{figure}
 
+% ---------------------------------------------------------------------
+\FloatBarrier
 \subsection{A5: Prague 1 and flat white prices above the median}
 
 \textbf{Question.} Is a flat white more likely to cost above the median price in Prague~1 than elsewhere, and by how many percentage points?
 
 \textbf{Hypotheses.}
 \begin{itemize}
-  \item $H_0$: the share of caf\'es with a flat white price above the median is the same in Prague~1 and elsewhere ($\pi_{\text{Prague 1}} = \pi_{\text{elsewhere}}$).
-  \item $H_1$: the share is higher in Prague~1 ($\pi_{\text{Prague 1}} > \pi_{\text{elsewhere}}$; one-tailed, fixed in advance).
+  \item $H_0$: the share of caf\'es with a flat white price above the median is the same in Prague~1 and elsewhere.
+  \item $H_1$: the share is higher in Prague~1 (one-tailed, fixed in advance).
 \end{itemize}
 
-\textbf{Method.} The median is the median flat white price of all caf\'es in the data (95~CZK). A caf\'e counts as ``above the median'' if its flat white price is strictly above 95~CZK. We used a chi-square test of independence on the $2 \times 2$ table. The smallest expected count was 21.8, well above 5, so Fisher's exact test was not needed. The one-tailed $p$-value comes from the equivalent one-sided test of proportions. 197 caf\'es are included (two were excluded because of a missing price).
+\textbf{Method.} The median is the median flat white price of all caf\'es (\AFiveMedian{}~CZK); a caf\'e is ``above the median'' if its price is strictly above it. We used a chi-square test of independence on the $2 \times 2$ table. The smallest expected count was \AFiveMinExp{}, so the chi-square test is appropriate (Fisher's exact test is needed only below 5). The one-tailed $p$-value comes from the equivalent one-sided test of proportions.
 
-\textbf{Results.} In Prague~1, 34 of 67 caf\'es (50.7\%) charged above the median, compared with 30 of 130 (23.1\%) elsewhere. The difference is 27.7 percentage points (95\% CI [13.7, 41.7]), $\chi^2(1, N = 197) = 15.43$, one-tailed $p < .001$, Cram\'er's $V = .28$. The standardised residuals are $\pm 3.93$ in the above-median column, so the Prague~1 above-median cell is over-represented and the elsewhere cell is under-represented.
+\textbf{Results.} In Prague~1, \AFiveYesOne{} of \AFiveNOne{} caf\'es (\AFivePctOne{}\%) charged above the median, compared with \AFiveYesTwo{} of \AFiveNTwo{} (\AFivePctTwo{}\%) elsewhere. The difference is \AFiveEst{} (95\% CI \AFiveCI{}), \AFiveTest{}, \AFiveEff{}, \AFiveP{} (one-tailed). The largest standardised residual in absolute value is \AFiveStdRes{}.
 
-\textbf{Interpretation.} In this sample, caf\'es in Prague~1 were much more likely to price a flat white above the median: about half did, against less than a quarter elsewhere. The association is moderate in strength, and the interval shows that the difference is likely to be substantial (from about 14 to 42 percentage points). Because caf\'es in the same district are not independent and the sample is not random, this describes the sampled caf\'es and does not show that being in Prague~1 causes higher prices.
+\textbf{Interpretation.} In this sample, caf\'es in Prague~1 were much more likely to price a flat white above the median. The association is moderate in strength, and the interval shows the difference is likely to be substantial. Because caf\'es in the same district are not independent and the sample is not random, this describes the sampled caf\'es and does not show that being in Prague~1 causes higher prices.
 
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \safetablew{tables/A5_table.tex}
-  \caption{Flat white price above the median (95~CZK) in Prague~1 and elsewhere. The $p$-value is one-tailed.}
+  \caption{Flat white price above the median in Prague~1 and elsewhere. The $p$-value is one-tailed.}
 \end{table}
 
-\begin{figure}[ht]
+\begin{figure}[!htbp]
   \centering
   \safefigure[0.6]{figures/A5_figure.pdf}
   \caption{Share of caf\'es with a flat white price above the median in Prague~1 and elsewhere, with 95\% confidence intervals.}
 \end{figure}
 
+% ---------------------------------------------------------------------
+\FloatBarrier
 \subsection{A6: Cappuccino price and Adjusted Rating}
 
 \textbf{Question.} Is the cappuccino price correlated with a caf\'e's Adjusted Rating, and if so, in which direction and how strongly?
@@ -299,24 +295,26 @@ The pairwise comparisons show where this difference comes from:
   \item $H_1$: there is a correlation, $\rho \neq 0$ (two-tailed).
 \end{itemize}
 
-\textbf{Method.} Pearson's correlation, because both variables met the criteria for a parametric method (Appendix~B). 195 caf\'es have both values; four were excluded because of a missing rating or number of ratings.
+\textbf{Method.} Pearson's correlation, as the descriptive table supports a parametric method for both variables (Appendix~B). $n = \ASixN{}$; \ASixLost{} caf\'es were excluded because of a missing rating or number of ratings.
 
-\textbf{Results.} The correlation was $r = -.22$ (95\% CI [$-.35$, $-.08$]), $t(193) = -3.15$, $p = .002$, $n = 195$. The squared coefficient is $r^2 = .05$, so Adjusted Rating shares about 5\% of its variance with the cappuccino price.
+\textbf{Results.} The correlation was \ASixEst{} (95\% CI \ASixCI{}), \ASixTest{}, \ASixP{}, $n = \ASixN{}$. The squared coefficient is \ASixEff{}, the share of variance that the two variables share.
 
-\textbf{Interpretation.} The relationship is negative and weak: in this sample, higher-rated caf\'es tend to charge slightly \emph{less} for a cappuccino, not more. The interval excludes zero, so there is evidence of a correlation, but it explains very little of the variation in prices. A correlation is not an effect, and this result does not suggest that ratings cause prices.
+\textbf{Interpretation.} The relationship is weak, and its negative sign means that higher-rated caf\'es tend to charge slightly \emph{less} for a cappuccino, not more. The interval excludes zero, so there is evidence of a correlation, but it explains very little of the variation in prices. A correlation is not an effect, and this result does not suggest that ratings cause prices.
 
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \safetablew{tables/A6_table.tex}
   \caption{Pearson correlation between cappuccino price and Adjusted Rating.}
 \end{table}
 
-\begin{figure}[ht]
+\begin{figure}[!htbp]
   \centering
   \safefigure[0.7]{figures/A6_figure.pdf}
   \caption{Cappuccino price against Adjusted Rating with a linear fit and 95\% confidence band.}
 \end{figure}
 
+% ---------------------------------------------------------------------
+\FloatBarrier
 \subsection{A7: Simple regression of cappuccino price on Adjusted Rating}
 
 \textbf{Question.} By how many CZK does the cappuccino price change per point of Adjusted Rating?
@@ -327,52 +325,56 @@ The pairwise comparisons show where this difference comes from:
   \item $H_1$: the slope differs from zero, $\beta_1 \neq 0$ (two-tailed).
 \end{itemize}
 
-\textbf{Method.} Ordinary least squares regression. The Breusch--Pagan test indicated non-constant variance ($p = .019$), so HC3 robust standard errors were used. The residuals departed from normality (Shapiro--Wilk $p = .009$), and 10 caf\'es exceeded Cook's distance of $4/n$; they were kept in the analysis. Details are in Appendix~C. $n = 195$.
+\textbf{Method.} Ordinary least squares regression. The Breusch--Pagan test gave \ASevenBP{}, and HC3 robust standard errors were used where constant variance was rejected. The Shapiro--Wilk test on the residuals gave \ASevenSW{}, and \ASevenCook{} caf\'es exceeded Cook's distance of $4/n$; they were kept (Appendix~C). $n = \ASevenN{}$.
 
-\textbf{Results.} The estimated slope is $-16.3$~CZK per point of Adjusted Rating (95\% CI [$-26.4$, $-6.2$]), $t(193) = -3.18$, $p = .002$, $R^2 = .05$.
+\textbf{Results.} The estimated slope is \ASevenEst{} (95\% CI \ASevenCI{}), \ASevenTest{}, \ASevenP{}, \ASevenEff{}.
 
-\textbf{Interpretation.} Adjusted Ratings range only from about 3.6 to 4.9, so a full point is much more than the real spread. A more realistic reading is that a caf\'e rated 0.1 points higher charges about 1.6~CZK less for a cappuccino. The effect is statistically clear but small in practice, and the model explains only 5\% of the variation in prices. The result is an association, not a causal effect.
+\textbf{Interpretation.} Adjusted Ratings cover only a narrow range, so a full point is much more than the real spread. A caf\'e rated 0.1 points higher is associated with a cappuccino price that differs by \ASevenPerTenth{}~CZK. The effect is statistically clear but small in practice, and the model explains only a small share of the variation in prices. The result is an association, not a causal effect.
 
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \safetablew{tables/A7_table.tex}
-  \caption{Regression of cappuccino price (CZK) on Adjusted Rating with HC3 robust standard errors.}
+  \caption{Regression of cappuccino price (CZK) on Adjusted Rating with HC3 robust standard errors where constant variance was rejected.}
 \end{table}
 
-\begin{figure}[ht]
+\begin{figure}[!htbp]
   \centering
   \safefigure[0.7]{figures/A7_figure.pdf}
   \caption{Cappuccino price against Adjusted Rating with the fitted regression line and 95\% confidence band.}
 \end{figure}
 
-\subsection{A8: Does the link hold after accounting for espresso price?}
+% ---------------------------------------------------------------------
+\FloatBarrier
+\subsection{A8: Multiple regression with Adjusted Rating and espresso price}
 
 \textbf{Question.} Does the link between Adjusted Rating and cappuccino price hold once the espresso price is accounted for, and if so, how much of it remains?
 
-\textbf{Hypotheses.}
+\textbf{Hypotheses.} In the model $\text{cappuccino} = \beta_0 + \beta_1\,\text{rating} + \beta_2\,\text{espresso} + \varepsilon$:
 \begin{itemize}
-  \item $H_0$: given the espresso price, the slope of Adjusted Rating is zero, $\beta_{\text{rating}} = 0$.
-  \item $H_1$: given the espresso price, the slope differs from zero, $\beta_{\text{rating}} \neq 0$ (two-tailed).
+  \item $H_0$: given the espresso price, the slope of Adjusted Rating is zero, $\beta_1 = 0$.
+  \item $H_1$: given the espresso price, the slope differs from zero, $\beta_1 \neq 0$ (two-tailed).
 \end{itemize}
 
-\textbf{Method.} Multiple linear regression of cappuccino price on Adjusted Rating and espresso price, estimated on the same 195 caf\'es as the simple model so that the two slopes can be compared. The Breusch--Pagan test indicated non-constant variance in both models ($p = .019$ and $p < .001$), so HC3 robust standard errors were used. The variance inflation factor was 1.05, so collinearity is not a concern. 18 caf\'es exceeded Cook's distance of $4/n$ and were kept (Appendix~C).
+\textbf{Method.} A multiple linear regression of cappuccino price on Adjusted Rating and espresso price together. The coefficient of Adjusted Rating is its association with cappuccino price \emph{holding the espresso price constant}. The Breusch--Pagan test gave \AEightBP{}, and HC3 robust standard errors were used where constant variance was rejected. The variance inflation factor was \AEightVIF{}. The Shapiro--Wilk test on the residuals gave \AEightSW{}, and \AEightCook{} caf\'es exceeded Cook's distance of $4/n$ (Appendix~C). $n = \AEightN{}$.
 
-\textbf{Results.} With espresso price in the model, the slope of Adjusted Rating is $-2.7$~CZK per point (95\% CI [$-12.4$, 7.0]), $t(192) = -0.55$, $p = .584$. This is 16.6\% of the slope without espresso price ($-16.3$~CZK). The espresso price coefficient is 0.97 (95\% CI [0.82, 1.11], $p < .001$), and $R^2$ rises from .05 to .68.
+\textbf{Results.} The coefficient of Adjusted Rating is \AEightEst{} (95\% CI \AEightCI{}), \AEightTest{}, \AEightP{}. The coefficient of the espresso price is \AEightEsp{} (95\% CI \AEightEspCI{}, \AEightEspP{}), and \AEightEff{}. Without the espresso price the slope of Adjusted Rating was \AEightSimple{}~CZK per point (as in A7), so \AEightRemain{}\% of it remains once espresso price is included.
 
-\textbf{Interpretation.} The link between rating and cappuccino price does not hold once espresso price is accounted for: only about one sixth of the original slope remains, and its interval includes zero (and values in either direction). This means the negative rating--price association in A6 and A7 is mostly an association with how expensive a caf\'e's espresso is: higher-rated caf\'es tend to have cheaper espresso, and cappuccino prices follow espresso prices almost one for one. The data cannot rule out a small remaining association, because the interval is wide. This is not causal evidence.
+\textbf{Interpretation.} Most of the association between Adjusted Rating and cappuccino price disappears once espresso price is accounted for, and the remaining coefficient cannot be distinguished from zero; its interval is wide, so we cannot rule out a small remaining association. The espresso price coefficient is close to one: cappuccino prices follow espresso prices almost one for one. A likely reading is that the rating--price association in A6 and A7 mostly reflects higher-rated caf\'es having cheaper espresso, but the data do not test this directly. The result is not causal evidence.
 
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \safetablew{tables/A8_table.tex}
-  \caption{Regression of cappuccino price (CZK) on Adjusted Rating and espresso price with HC3 robust standard errors.}
+  \caption{Regression of cappuccino price (CZK) on Adjusted Rating and espresso price with HC3 robust standard errors where constant variance was rejected.}
 \end{table}
 
-\begin{figure}[ht]
+\begin{figure}[!htbp]
   \centering
-  \safefigure[0.6]{figures/A8_figure.pdf}
-  \caption{Slope of Adjusted Rating (CZK per rating point) with 95\% confidence interval, without and with espresso price in the model.}
+  \safefigure[0.7]{figures/A8_figure.pdf}
+  \caption{Cappuccino price and Adjusted Rating, each after removing what the espresso price explains. The slope of the line is the Adjusted Rating coefficient of the multiple regression; the band is its 95\% confidence band.}
 \end{figure}
 
+% ---------------------------------------------------------------------
+\FloatBarrier
 \subsection{A9: Does the rating--price relationship differ between roasteries and other caf\'es?}
 
 \textbf{Question.} Does the relationship between Adjusted Rating and cappuccino price differ between roasteries and other caf\'es, and if so, how?
@@ -383,185 +385,173 @@ The pairwise comparisons show where this difference comes from:
   \item $H_1$: the interaction coefficient differs from zero, so the slopes differ (two-tailed).
 \end{itemize}
 
-\textbf{Method.} A linear regression of cappuccino price on Adjusted Rating, roastery status and their interaction, with other caf\'es as the reference group. The Breusch--Pagan test indicated non-constant variance ($p = .045$), so HC3 robust standard errors were used. The residuals departed from normality (Shapiro--Wilk $p = .006$), and seven caf\'es exceeded Cook's distance of $4/n$ (Appendix~C). The analysis includes 195 caf\'es, 23 of them roasteries.
+\textbf{Method.} A linear regression of cappuccino price on Adjusted Rating, roastery status and their interaction, with other caf\'es as the reference group. The Breusch--Pagan test gave \ANineBP{}, and HC3 robust standard errors were used where constant variance was rejected. The Shapiro--Wilk test on the residuals gave \ANineSW{}, and \ANineCook{} caf\'es exceeded Cook's distance of $4/n$ (Appendix~C). The analysis includes \ANineN{} caf\'es, \ANineRoast{} of them roasteries.
 
-\textbf{Results.} In other caf\'es the slope of Adjusted Rating is $-16.0$~CZK per point (95\% CI [$-26.8$, $-5.2$]). In roasteries the slope is $-27.3$~CZK per point (interval in Table~\ref{tab:a9slopes}). The interaction coefficient, the difference between the two slopes, is $-11.3$~CZK (95\% CI [$-45.9$, 23.3]), $t(191) = -0.65$, $p = .519$, $R^2 = .06$.
+\textbf{Results.} In other caf\'es the slope of Adjusted Rating is \ANineSlopeOther{}~CZK per point (95\% CI \ANineSlopeOtherCI{}). In roasteries it is \ANineSlopeRoast{}~CZK per point (95\% CI \ANineSlopeRoastCI{}). The interaction coefficient, the difference between the two slopes (roasteries minus others), is \ANineInt{}~CZK (95\% CI \ANineCI{}), \ANineTest{}, \ANineP{}, \ANineEff{}.
 
-\textbf{Interpretation.} The estimated slope is steeper in roasteries, but the difference is small relative to its uncertainty, and the interval includes zero and large differences in both directions. There is therefore no evidence that the relationship between rating and cappuccino price differs between roasteries and other caf\'es. With only 23 roasteries, the analysis cannot distinguish a real difference from chance. The coefficient on roastery status alone refers to a rating of zero, which is outside the data, so we do not interpret it.
+\textbf{Interpretation.} The interaction coefficient is small relative to its uncertainty, and its interval includes zero and large differences in both directions, so there is no evidence that the relationship between rating and cappuccino price differs between roasteries and other caf\'es. With so few roasteries the analysis cannot distinguish a real difference from chance. The coefficient on roastery status alone refers to a rating of zero, which is outside the data, so we do not interpret it.
 
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \safetablew{tables/A9_table.tex}
-  \caption{Regression of cappuccino price (CZK) on Adjusted Rating, roastery status and their interaction with HC3 robust standard errors.}
+  \caption{Regression of cappuccino price (CZK) on Adjusted Rating, roastery status and their interaction with HC3 robust standard errors where constant variance was rejected.}
 \end{table}
 
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \safetablew{tables/A9_slopes.tex}
   \caption{Estimated slope of Adjusted Rating (CZK per rating point) in other caf\'es and in roasteries.}
-  \label{tab:a9slopes}
 \end{table}
 
-\begin{figure}[ht]
+\begin{figure}[!htbp]
   \centering
   \safefigure[0.7]{figures/A9_figure.pdf}
   \caption{Cappuccino price against Adjusted Rating in roasteries and other caf\'es, with fitted lines and 95\% confidence bands.}
 \end{figure}
 
+% ---------------------------------------------------------------------
+\FloatBarrier
 \subsection{A10: Adjusted Rating and the probability of an above-median flat white}
 
 \textbf{Question.} Is a flat white more likely to cost above the median price in better-rated caf\'es, and if so, by how many percentage points per 0.1 of Adjusted Rating?
 
 \textbf{Hypotheses.}
 \begin{itemize}
-  \item $H_0$: Adjusted Rating (per 0.1) has no association with the probability of an above-median flat white price; the average marginal effect is zero.
-  \item $H_1$: better-rated caf\'es are more likely to charge above the median; the coefficient and the average marginal effect are positive (one-tailed, fixed in advance).
+  \item $H_0$: Adjusted Rating (per 0.1) has no association with the probability of an above-median flat white price; the coefficient and the average marginal effect are zero.
+  \item $H_1$: the coefficient differs from zero (two-tailed).
 \end{itemize}
 
-\textbf{Method.} Logistic regression of the indicator ``flat white price above the median'' (1 if above 95~CZK, 0 otherwise) on Adjusted Rating per 0.1 points. The main result is the average marginal effect in percentage points, computed from the model with a delta-method confidence interval. The likelihood-ratio test for a quadratic term gave $p = .981$, so a linear logit is adequate. Eight caf\'es exceeded Cook's distance of $4/n$ and were kept; the smaller outcome class has 63 caf\'es, and McFadden's pseudo-$R^2$ is .06 (Appendix~C). $n = 194$.
+\textbf{Method.} Logistic regression of the indicator ``flat white price above the median'' (strictly above \AFiveMedian{}~CZK) on Adjusted Rating per 0.1 points. The main result is the average marginal effect in percentage points, with a delta-method confidence interval. The likelihood-ratio test for a quadratic term gave \ATenLin{}, so a linear logit is adequate. \ATenCook{} caf\'es exceeded Cook's distance of $4/n$ and were kept; the smaller outcome class has \ATenEvents{} caf\'es, and McFadden's pseudo-$R^2$ is \ATenMcf{} (Appendix~C). $n = \ATenN{}$.
 
-\textbf{Results.} The estimated average marginal effect is $-6.19$ percentage points per 0.1 points of Adjusted Rating (95\% CI [$-9.17$, $-3.21$]). The odds ratio is 0.74 (95\% CI [0.62, 0.87]), $z = -3.58$. Because the effect points in the opposite direction from $H_1$, the one-tailed $p$-value is above .999.
+\textbf{Results.} The estimated average marginal effect is \ATenEst{} (95\% CI \ATenCI{}). The odds ratio is \ATenOR{} (95\% CI \ATenORCI{}), \ATenTest{}, \ATenP{}.
 
-\textbf{Interpretation.} We do not reject $H_0$ and find no evidence that better-rated caf\'es are more likely to charge above the median for a flat white. The estimated association is in the opposite direction: caf\'es rated 0.1 points higher were about 6 percentage points \emph{less} likely to be above the median. This direction was not predicted, so it is an exploratory observation, to be treated as a lead for further work and not as a confirmed finding, and a two-tailed test would not have been planned. It is consistent with the negative associations in A6--A8. The association is not a causal effect.
+\textbf{Interpretation.} Because the average marginal effect is negative and its interval excludes zero, we reject $H_0$: in this sample, caf\'es with a higher Adjusted Rating were \emph{less} likely, not more likely, to charge above the median for a flat white. This is consistent with the negative associations in A6--A8. The association is not a causal effect.
 
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering
   \safetablew{tables/A10_table.tex}
-  \caption{Logistic regression of an above-median flat white price on Adjusted Rating per 0.1 points: average marginal effect and odds ratio. The $p$-value is one-tailed.}
+  \caption{Logistic regression of an above-median flat white price on Adjusted Rating per 0.1 points: average marginal effect and odds ratio.}
 \end{table}
 
-\begin{figure}[ht]
+\begin{figure}[!htbp]
   \centering
   \safefigure[0.7]{figures/A10_figure.pdf}
   \caption{Predicted probability that a flat white price is above the median by Adjusted Rating, with 95\% confidence band. Points are individual caf\'es.}
 \end{figure}
 
 % =====================================================================
+\FloatBarrier
 \section{Discussion and Limitations}
 
+\FloatBarrier
 \subsection{Summary of findings}
 
-In this sample the average espresso cost 64.7~CZK, essentially the equivalent of 3~US dollars, and roasteries charged about 3.3~CZK more than other caf\'es, a difference that is not statistically clear. A flat white cost about 12~CZK more than a cappuccino in the same caf\'e, which was the most precisely estimated result. Prices differed by caf\'e type: local chains charged 5.6~CZK more for a cappuccino than independent caf\'es, while the larger gap between independent caf\'es and international chains (16.6~CZK) rests on only ten caf\'es and could not be separated from chance. Location mattered strongly: half of the caf\'es in Prague~1 priced a flat white above the sample median (95~CZK), compared with less than a quarter elsewhere.
+In this sample the mean espresso price was \AOneEst{}, close to the \AOneBench{}~CZK equivalent of 3~US dollars, and roasteries differed from other caf\'es by \ATwoEst{}, a difference that is not statistically clear. A flat white cost about \AThreeEst{} more than a cappuccino in the same caf\'e, which was the most precisely estimated result. Prices differed by caf\'e type, mainly between independent caf\'es and local chains, while the international chains are too few (\AFourNInt{}) to say more. Location mattered strongly: the share of caf\'es pricing a flat white above the median was \AFivePctOne{}\% in Prague~1 and \AFivePctTwo{}\% elsewhere.
 
-Higher-rated caf\'es tended to charge slightly less rather than more. The correlation between cappuccino price and adjusted rating was $-.22$, and each rating point went with 16.3~CZK lower cappuccino prices. Once the espresso price was accounted for, only about one sixth of this slope remained and it could no longer be distinguished from zero. This suggests that the association mainly reflects higher-rated caf\'es having cheaper espresso, with cappuccino prices following espresso prices. We found no evidence that the rating--price relationship differs between roasteries and other caf\'es. In the logistic regression, better-rated caf\'es were not more likely to charge above the median for a flat white; the estimated effect was in the opposite direction ($-6.2$ percentage points per 0.1 rating points). This direction was not predicted in advance, so it should be read as an exploratory lead and not as a confirmed finding.
+Higher-rated caf\'es tended to charge slightly less rather than more. The correlation between cappuccino price and Adjusted Rating was \ASixEst{}, and the simple regression slope was \ASevenEst{}. When the espresso price was added (A8), only \AEightRemain{}\% of the slope remained and it could no longer be distinguished from zero. This suggests that the association mainly reflects higher-rated caf\'es having cheaper espresso, with cappuccino prices following espresso prices. We found no evidence that the rating--price relationship differs between roasteries and other caf\'es (A9). In the logistic regression, better-rated caf\'es were less likely to charge above the median for a flat white, by \ATenEst{} (A10).
 
+\FloatBarrier
 \subsection{Limitations}
 
-Several limitations should be kept in mind.
 \begin{itemize}
   \item \textbf{Convenience sample.} Caf\'es were chosen by students, not randomly, so the results describe the sampled caf\'es and cannot automatically be generalised to Prague. We therefore write ``in this sample'' throughout.
-  \item \textbf{Observational data.} All relationships are associations and not causal effects. For example, the negative link between rating and price may reflect location or other characteristics that we did not control for.
+  \item \textbf{Observational data.} All relationships are associations and not causal effects. For example, the link between rating and price may reflect location or other caf\'e characteristics that we did not control for.
   \item \textbf{Non-independent observations.} Caf\'es in the same district share rents, customers and local market conditions, so their prices are not independent. We did not model this clustering, so the confidence intervals and $p$-values of all tests that assume independence may be too narrow or too small.
-  \item \textbf{Small groups.} Only 23 roasteries and 10 international chains were in the data, which limits the power of A2, A4 and A9. A non-significant result in these analyses means that there is no evidence of a difference, not that none exists.
-  \item \textbf{Violated regression assumptions.} In A7--A9 the residual variance was not constant, so we used robust standard errors, and the residuals were not normal. A few caf\'es had a large influence (Cook's distance above $4/n$). We kept these caf\'es and did not re-estimate the models without them, so we cannot say how sensitive the coefficients are to them.
-  \item \textbf{Analytic choices.} The A1 benchmark depends on the exchange rate (21.76~CZK per USD, CNB, 3 November 2026); a rate a few crowns different would move the benchmark and could change the result. Where a price cell listed several prices we kept the first, and a different rule could change some results. One caf\'e that was entered twice was counted once. The above-median indicator in A5 and A10 counts caf\'es priced exactly at the median as not above it.
-  \item \textbf{Missing data.} No caf\'es were lost in A1 and A2, two in A3 and A5, one in A4, four in A6--A9 and five in A10, because of missing prices, caf\'e types, ratings or numbers of ratings. We did not impute any values.
-  \item \textbf{Many tests.} We ran ten primary tests at $\alpha = .05$, so some significant results could arise by chance. Borderline results should be treated as leads for further work. The hypotheses and the directions of the one-tailed alternatives (A2, A3, A5 and A10) were written before the analysis. The only unplanned finding that we highlight, the negative direction in A10, is labelled exploratory.
+  \item \textbf{Small groups.} Only \ATwoNRoast{} roasteries and \AFourNInt{} international chains are in the data, which limits the power of A2, A4 and A9. A non-significant result in these analyses means that there is no evidence of a difference, not that none exists.
+  \item \textbf{Violated regression assumptions.} In A7--A9 the Breusch--Pagan test (Appendix~C) indicated non-constant residual variance, so we used robust standard errors, and the residuals were not normal. A few caf\'es had a large influence (Cook's distance above $4/n$). We kept these caf\'es and did not re-estimate the models without them, so we cannot say how sensitive the coefficients are to them.
+  \item \textbf{Analytic choices.} The A1 benchmark depends on the exchange rate (\AOneRate{}~CZK per USD, CNB, 3~November 2026). Where a price cell listed several prices we kept the first, and a different rule could change some results. Caf\'es that had been entered twice were counted once. The above-median indicator in A5 and A10 counts caf\'es priced exactly at the median as not above it.
+  \item \textbf{Missing data.} The number of caf\'es lost to missing values was \AOneLost{} in A1, \ATwoLost{} in A2, \AThreeLost{} in A3, \AFourLost{} in A4, \AFiveLost{} in A5, \ASixLost{} in A6 to A9 (A9: \ANineLost{}) and \ATenLost{} in A10, because of missing prices, caf\'e types, ratings or numbers of ratings. We did not impute any values.
+  \item \textbf{Many tests.} We ran ten primary tests at $\alpha = .05$, so some significant results could arise by chance, and borderline results should be treated as leads for further work. The hypotheses and the directions of the one-tailed alternatives (A2, A3 and A5) were written before the analysis. No result in this report is exploratory unless it is labelled so.
 \end{itemize}
 
+\FloatBarrier
 \section{Conclusion}
 
-In this sample of Prague caf\'es, a typical espresso costs about what 3~US dollars would buy, a flat white costs about 12~CZK more than a cappuccino, caf\'es in Prague~1 are much more likely to charge above the median for a flat white, and local chains charge slightly more for a cappuccino than independent caf\'es. Higher Google ratings are not a sign of higher prices: if anything, better-rated caf\'es charged slightly less, and this largely reflects their lower espresso prices. We found no clear evidence that roasteries charge more. Because the data are a convenience sample and observational, these are patterns among the sampled caf\'es and not causal effects.
+In this sample of Prague caf\'es, a typical espresso costs about what 3~US dollars would buy, and a flat white costs about \AThreeEst{} more than a cappuccino in the same caf\'e. Caf\'es in Prague~1 are much more likely to charge above the median for a flat white, and local chains charge somewhat more for a cappuccino than independent caf\'es. Higher Google ratings are not a sign of higher prices: if anything, better-rated caf\'es charge slightly less, and this largely reflects their lower espresso prices. We found no clear evidence that roasteries charge more. Because the data are a convenience sample and observational, these are patterns among the sampled caf\'es and not causal effects.
 
 % =====================================================================
 \appendix
 
+\FloatBarrier
 \section{Descriptive statistics}\label{app:desc}
 
 Table~\ref{tab:dstats} gives the descriptive statistics of every variable and group used in the analyses, and Table~\ref{tab:dcat} the counts and percentages of the categorical variables.
 
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering\small
   \safetablew{tables/D_stats.tex}
-  \caption{Descriptive statistics of the variables and groups used in the analyses (prices in CZK; Adjusted Rating in points). ``Boot. skew'' is the skewness of 5{,}000 bootstrapped means (seed 2026).}
+  \caption{Descriptive statistics of the variables and groups used in the analyses (prices in CZK; Adjusted Rating in points). ``Boot.\ skew'' is the skewness of 5{,}000 bootstrapped means (seed 2026).}
   \label{tab:dstats}
 \end{table}
 
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering\small
   \safetablew{tables/D_cat_table.tex}
   \caption{Counts and percentages of the categorical variables, and the number of missing values.}
   \label{tab:dcat}
 \end{table}
 
+\FloatBarrier
 \section{Distributions, normality and test selection}\label{app:norm}
-
-\subsection{Missing data per analysis}
-
-The number of caf\'es lost to missing values differs between analyses: none in A1 and A2, two in A3, one in A4, two in A5, four in each of A6--A9 and five in A10.
-
-\subsection{Parametric or non-parametric}
 
 Table~\ref{tab:dtable} shows, for every variable and group, whether it can be analysed with a parametric or a non-parametric test. A group was judged approximately normal if its absolute skewness was at most 0.5 (judged together with the histograms and Q--Q plots in Figures~\ref{fig:dhist}--\ref{fig:dboot}). Otherwise the central limit theorem was considered to apply if the group had at least 30 caf\'es and the distribution of 5{,}000 bootstrapped means was not visibly skewed. A parametric test was justified if either condition held.
 
-\begin{table}[ht]
+\begin{table}[!htbp]
   \centering\small
   \safetablew{tables/D_table.tex}
   \caption{Normality and central limit checks and the resulting choice of method for each variable and group.}
   \label{tab:dtable}
 \end{table}
 
-\begin{figure}[ht]
+\begin{figure}[!htbp]
   \centering
   \safefigure[0.9]{figures/D_hist.pdf}
   \caption{Histograms of the variables and groups used in the analyses.}
   \label{fig:dhist}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[!htbp]
   \centering
   \safefigure[0.9]{figures/D_box.pdf}
   \caption{Box plots with individual caf\'es, side by side for the groups that are compared.}
   \label{fig:dbox}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[!htbp]
   \centering
   \safefigure[0.9]{figures/D_qq.pdf}
   \caption{Normal Q--Q plots of the variables and groups used in the analyses.}
   \label{fig:dqq}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[!htbp]
   \centering
   \safefigure[0.9]{figures/D_bootmeans.pdf}
   \caption{Distribution of 5{,}000 bootstrapped means for each variable and group (random seed 2026).}
   \label{fig:dboot}
 \end{figure}
 
-\subsection{Justification of the tests}
-
-\begin{itemize}
-  \item \textbf{A1} A one-sample $t$-test with a bootstrap confidence interval compares the mean espresso price with the benchmark of 65.3~CZK.
-  \item \textbf{A2} Welch's $t$-test compares espresso prices in roasteries and other caf\'es. Levene's test did not indicate unequal variances ($p = .172$), but Welch's test was used regardless.
-  \item \textbf{A3} A paired $t$-test is appropriate because both prices were recorded in the same caf\'es.
-  \item \textbf{A4} Welch's ANOVA with Games--Howell comparisons, because Levene's test indicated unequal variances ($p < .001$).
-  \item \textbf{A5} A chi-square test of independence for location and a flat white price above the median.
-  \item \textbf{A6} Pearson's correlation for the linear relationship between two numerical variables.
-  \item \textbf{A7--A9} Linear regression with HC3 robust standard errors, because the Breusch--Pagan test indicated non-constant variance.
-  \item \textbf{A10} Logistic regression, because the outcome is binary, with the average marginal effect in percentage points.
-\end{itemize}
-
+\FloatBarrier
 \section{Checks of assumptions and regression diagnostics}\label{app:diag}
 
+\FloatBarrier
 \subsection{Group comparisons and the contingency table}
 
-For A2, Levene's test gave $p = .172$, so there is no evidence of unequal variances between roasteries and other caf\'es; Welch's test was used regardless. In A3, seven caf\'es charged the same price for both drinks. For A4, Levene's test indicated unequal variances across caf\'e types ($p < .001$), which supported Welch's ANOVA and Games--Howell comparisons; the smallest caf\'e-type group had 10 caf\'es.
+For A2, Levene's test gave \ATwoLevene{}, and Welch's test was used regardless. For A4, Levene's test gave \AFourLevene{}, which supports Welch's ANOVA and Games--Howell comparisons; the smallest caf\'e-type group had \AFourNInt{} caf\'es. In A3, \AThreeSame{} caf\'es charged the same price for both drinks. For A5, the smallest expected cell count was \AFiveMinExp{}, so Fisher's exact test was not needed; the largest standardised residual in absolute value was \AFiveStdRes{} (see the observed and expected counts in the A5 check table below).
 
-For A5, the smallest expected cell count was 21.8, well above 5, so Fisher's exact test was not needed. Among caf\'es above the median, 34 were in Prague~1 and 30 elsewhere, against expected counts of 21.77 and 42.23 (standardised residuals $+3.93$ and $-3.93$). Among caf\'es at or below the median, the observed counts were 33 and 100 (expected 45.23 and 87.77; residuals $-3.93$ and $+3.93$). Prague~1 caf\'es are therefore over-represented among those charging above the median.
-
+\FloatBarrier
 \subsection{Linear regressions (A7--A9)}
 
-The Breusch--Pagan test indicated non-constant variance in all three regression families: $p = .019$ in A7, $p = .019$ (simple model) and $p < .001$ (multiple model) in A8, and $p = .045$ in A9. HC3 robust standard errors were therefore used. The Shapiro--Wilk test indicated residuals that depart from normality ($p = .009$ in A7, $p < .001$ in A8 and $p = .006$ in A9). The sample sizes are large enough that this matters little for the coefficients, but it affects exact $t$-based intervals and should be kept in mind.
+The Breusch--Pagan test gave \ASevenBP{} in A7, \AEightBP{} in A8 and \ANineBP{} in A9; HC3 robust standard errors were used where constant variance was rejected. The Shapiro--Wilk test on the residuals gave \ASevenSW{} in A7, \AEightSW{} in A8 and \ANineSW{} in A9. Cook's distance above $4/n$ flagged \ASevenCook{} caf\'es in A7, \AEightCook{} in A8 and \ANineCook{} in A9. These caf\'es were kept: exceeding the threshold does not show that an observation is erroneous. We did not re-estimate the models without them, so we cannot say how sensitive the coefficients are to their removal.
 
-Cook's distance above $4/n$ flagged 10 caf\'es in A7, 18 in A8 and 7 in A9. These caf\'es were kept: exceeding the threshold does not show that an observation is erroneous. We did not re-estimate the models without them, so we cannot say how sensitive the coefficients are to their removal.
+In A8 the variance inflation factor of Adjusted Rating was \AEightVIF{}. The roastery group in A9 contained \ANineRoast{} caf\'es.
 
-In A8 the variance inflation factor of Adjusted Rating was 1.05, so collinearity between the two predictors is not a concern. The roastery group in A9 contained 23 caf\'es.
-
+\FloatBarrier
 \subsection{Logistic regression (A10)}
 
-The likelihood-ratio test for a quadratic term gave $p = .981$, so there is no evidence against a linear logit. Eight caf\'es exceeded Cook's distance of $4/n$ and were kept. The smaller outcome class contained 63 caf\'es, and McFadden's pseudo-$R^2$ was .06.
+The likelihood-ratio test for a quadratic term gave \ATenLin{}. \ATenCook{} caf\'es exceeded Cook's distance of $4/n$ and were kept. The smaller outcome class contained \ATenEvents{} caf\'es, and McFadden's pseudo-$R^2$ was \ATenMcf{}.
 
+\FloatBarrier
 \subsection{Exported check tables and diagnostic plots}
 
 \checks{A1}{Checks for A1.}
@@ -575,26 +565,27 @@ The likelihood-ratio test for a quadratic term gave $p = .981$, so there is no e
 \checks{A9}{Checks for A9.}
 \checks{A10}{Checks for A10.}
 
-\begin{figure}[ht]
+\begin{figure}[!htbp]
   \centering
   \safefigure[0.95]{figures/A7_diag.pdf}
   \caption{A7: residuals against fitted values (left) and normal Q--Q plot of the standardised residuals (right).}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[!htbp]
   \centering
   \safefigure[0.95]{figures/A8_diag.pdf}
   \caption{A8: residuals against fitted values (left) and normal Q--Q plot of the standardised residuals (right).}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[!htbp]
   \centering
   \safefigure[0.95]{figures/A9_diag.pdf}
   \caption{A9: residuals against fitted values (left) and normal Q--Q plot of the standardised residuals (right).}
 \end{figure}
 
+\FloatBarrier
 \section{Reproducibility}\label{app:repro}
 
-The analysis was done in R and organised in three scripts that read the raw file and run in order: \texttt{01\_cleaning.R} cleans the raw data and writes \texttt{dataset.csv}; \texttt{02\_descriptive.R} describes the data and decides between parametric and non-parametric methods; and \texttt{03\_analysis.R} runs the ten analyses and exports every table and figure in this report. The scripts share helper functions in \texttt{interim/helpers.R}. All bootstrap procedures used 5{,}000 resamples and the random seed 2026. The raw data and the scripts allow the analysis to be repeated from the raw file.
+The analysis was done in R and organised in three scripts that read the raw file and run in order: \texttt{01\_cleaning.R} cleans the raw data and writes \texttt{dataset.csv}; \texttt{02\_descriptive.R} describes the data and decides between parametric and non-parametric methods; and \texttt{03\_analysis.R} runs the ten analyses and exports every table and figure in this report, together with the file \texttt{numbers.tex}, which holds every number quoted in the text. The scripts share helper functions in \texttt{interim/helpers.R}. All bootstrap procedures used 5{,}000 resamples and the random seed 2026. The raw data and the scripts allow the analysis to be repeated from the raw file.
 
 \end{document}

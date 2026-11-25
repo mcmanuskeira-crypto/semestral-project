@@ -38,13 +38,34 @@ f1 <- function(x) formatC(x, format = "f", digits = 1)
 f2 <- function(x) formatC(x, format = "f", digits = 2)
 fx <- function(variable, x) if (grepl("CZK", variable)) f1(x) else f2(x)   # prices: 1 decimal
 ci_str <- function(lo, hi, f = f2) paste0("[", f(lo), ", ", f(hi), "]")
-pplain <- function(p) ifelse(p < .001, "<.001", sub("^0", "", formatC(p, format = "f", digits = 3)))
-pfmt   <- function(p) ifelse(p < .001, "$p<.001$", paste0("$p=", sub("^0", "", formatC(p, format = "f", digits = 3)), "$"))
+pplain <- function(p) ifelse(p < .001, "<.001", ifelse(p > .999, ">.999",
+                      sub("^0", "", formatC(p, format = "f", digits = 3))))
+pfmt   <- function(p) ifelse(p < .001, "$p<.001$", ifelse(p > .999, "$p>.999$",
+                      paste0("$p=", sub("^0", "", formatC(p, format = "f", digits = 3)), "$")))
 
 # ---- export ----
+# make a value safe to place inside a LaTeX macro: escape & % # _ outside $...$ math and
+# turn a minus sign in front of a number (outside math) into a real minus
+tex_safe <- function(s) {
+  pieces <- strsplit(paste0(" ", s, " "), "$", fixed = TRUE)[[1]]
+  txt <- seq_along(pieces) %% 2 == 1
+  pieces[txt] <- gsub("([&%#_])", "\\\\\\1", pieces[txt])
+  pieces[txt] <- gsub("(^|[^A-Za-z0-9])-([0-9.])", "\\1$-$\\2", pieces[txt])
+  out <- paste(pieces, collapse = "$")
+  substr(out, 2, nchar(out) - 1)
+}
+
 write_tex <- function(df, name, align = NULL) {
-  esc <- function(x) gsub("([&%#_])", "\\\\\\1", as.character(x))
-  df[] <- lapply(df, function(col) ifelse(is.na(col), "", esc(col)))
+  esc1 <- function(s) {                      # escape & % # _ only OUTSIDE $...$ math
+    if (is.na(s)) return("")
+    pieces <- strsplit(paste0(" ", s, " "), "$", fixed = TRUE)[[1]]
+    txt <- seq_along(pieces) %% 2 == 1
+    pieces[txt] <- gsub("([&%#_])", "\\\\\\1", pieces[txt])
+    out <- paste(pieces, collapse = "$")
+    substr(out, 2, nchar(out) - 1)
+  }
+  esc <- function(x) vapply(as.character(x), esc1, character(1), USE.NAMES = FALSE)
+  df[] <- lapply(df, esc)
   if (is.null(align)) align <- paste0("l", strrep("r", ncol(df) - 1))
   hdr  <- paste(esc(names(df)), collapse = " & ")
   body <- do.call(paste, c(unname(as.list(df)), sep = " & "))
@@ -111,11 +132,17 @@ dunn_holm <- function(x, g) {
 }
 
 # ---- regression helpers ----
+pretty_term <- function(x) {                 # readable row labels in the regression tables
+  x <- sub("adj_rating:grpRoastery", "Adjusted Rating $\\times$ Roastery", x, fixed = TRUE)
+  x <- sub("adj_rating", "Adjusted Rating", x, fixed = TRUE)
+  x <- sub("espresso", "Espresso price", x, fixed = TRUE)
+  sub("grpRoastery", "Roastery", x, fixed = TRUE)
+}
 reg_table <- function(model, vc = NULL) {
   cf <- summary(model)$coefficients
   est <- cf[, 1]; se <- if (is.null(vc)) cf[, 2] else sqrt(diag(vc))
   dfr <- model$df.residual; tv <- est / se; p <- 2 * pt(-abs(tv), dfr); h <- qt(.975, dfr) * se
-  out <- data.frame(Term = rownames(cf), Estimate = f2(est), SE = f2(se),
+  out <- data.frame(Term = pretty_term(rownames(cf)), Estimate = f2(est), SE = f2(se),
                     CI = ci_str(est - h, est + h), t = f2(tv), p = pplain(p), stringsAsFactors = FALSE)
   extra <- data.frame(Term = c("Observations", "$R^2$"),
                       Estimate = c(as.character(nobs(model)), f2(summary(model)$r.squared)),
